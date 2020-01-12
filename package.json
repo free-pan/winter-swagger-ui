@@ -1,0 +1,22 @@
+{
+  "scripts": {
+    "serve": "cross-env publicPath=public/ umi dev",
+    "build": "umi build"
+  },
+  "dependencies": {
+    "antd": "^3.26.6",
+    "codemirror": "^5.50.2",
+    "dva": "^2.4.1",
+    "lodash": "^4.17.15",
+    "object-to-form": "^1.0.8",
+    "react": "^16.12.0",
+    "react-markdown": "^4.3.1",
+    "umi-request": "^1.2.17",
+    "xml-js": "^1.6.11"
+  },
+  "devDependencies": {
+    "babel-plugin-transform-remove-console": "^6.9.4",
+    "cross-env": "^6.0.3",
+    "umi-plugin-react": "^1.14.12"
+  }
+}

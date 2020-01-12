@@ -1,0 +1,75 @@
+@border-radius: 8px;
+@height: 30px;
+.api-summary {
+  border-radius: 8px 8px 0 0;
+  font-size: 22px;
+  height: 45px;
+  line-height: 45px;
+  position: absolute;
+  top: 56px;
+  z-index: 3;
+  background-color: rgba(255, 255, 255, 0.9);
+  width: calc(100% - 26px);
+}
+
+.api-name {
+  margin-left: 10px;
+  margin-right: 10px;
+}
+
+.tag-desc {
+  color: rgb(153, 153, 153);
+  font-size: 13px;
+}
+
+.uri-info {
+  display: flex;
+  background-color: #f8f6f9;
+  border-radius: @border-radius;
+  height: @height;
+  line-height: @height;
+  margin-bottom: 10px;
+  margin-top: 37px;
+}
+
+.request-method {
+  width: 90px;
+  text-align: center;
+  color: #f8f6f9;
+  border-radius: @border-radius;
+}
+
+.api-uri {
+  font-weight: bolder;
+  margin-left: 30px;
+}
+
+.other-info .label {
+  padding-left: 6px;
+  margin-right: 10px;
+}
+
+.big-title {
+  border-bottom: 2px solid #666;
+  padding-left: 5px;
+  margin-top: 15px;
+  font-size: 22px;
+}
+
+.small-title {
+  padding-left: 5px;
+  font-size: 17px;
+  margin-bottom: 5px;
+}
+
+.resp-code-info {
+  border-bottom: 3px dashed #f3f3f3;
+  margin-bottom: 5px;
+  margin-top: 10px;
+}
+
+.resp-code-info strong {
+  margin-right: 20px;
+  margin-left: 5px;
+  font-size: 16px;
+}
