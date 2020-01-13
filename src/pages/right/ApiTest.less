@@ -1,5 +1,5 @@
 .container {
-  height: calc(100vh - 142px);
+  height: calc(100vh - 163px);
   overflow-x: hidden;
   overflow-y: auto;
 }
@@ -11,4 +11,22 @@
 
 .editorBorder {
   border: 2px solid #333
+}
+
+.codemirrorDrawer {
+  :global {
+    .ant-drawer-content{
+      overflow: hidden;
+    }
+    .ant-drawer-body {
+      padding: 0 15px;
+    }
+
+    .ant-drawer-close {
+      top: -7px;
+      right: -8px;
+      height: 33px;
+      line-height: 35px;
+    }
+  }
 }

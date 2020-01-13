@@ -9,6 +9,7 @@
     "dva": "^2.4.1",
     "lodash": "^4.17.15",
     "object-to-form": "^1.0.8",
+    "prop-types": "^15.7.2",
     "react": "^16.12.0",
     "react-markdown": "^4.3.1",
     "umi-request": "^1.2.17",
