@@ -25,7 +25,7 @@ function mapStateToProps({GlobalModel}) {
 class BasicLayout extends Component {
 
   state = {
-    activeKey: 'ApiTest'
+    activeKey: 'AboutAuthor'
   }
 
   constructor(props) {
@@ -191,7 +191,7 @@ class BasicLayout extends Component {
       onTableRowDelete: this.onGlobalHeaderTableRowDelete
     }
 
-    const propsDocSummary = {show: activeKey === 'DocSummary'}
+    const propsDocSummary = {show: activeKey === 'DocSummary', swaggerDocBasicInfo}
 
     const propsAboutAuthor = {show: activeKey === 'AboutAuthor'}
 
