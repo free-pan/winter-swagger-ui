@@ -16,7 +16,8 @@ export function buildObjectInitVal(obj) {
   let initVal = {};
   if (!obj.children) {
     if (obj.type !== 'object') {
-      initVal = "";
+      const tmpInitVal = obj.default ? obj.default : obj.example ? obj.example : ''
+      initVal = tmpInitVal;
     }
   } else {
     for (let i = 0; i < obj.children.length; i++) {
@@ -52,7 +53,9 @@ export function buildBodyParamInitValue(bodyName, consumesIsJson, paramList) {
   for (const singleParam of paramList) {
     const paramName = singleParam.name;
     let initialValue;
-    if (singleParam.type === 'object') {
+    if (singleParam.type === 'boolean') {
+      initialValue = buildObjectInitVal(singleParam);
+    }else if (singleParam.type === 'object') {
       initialValue = buildObjectInitVal(singleParam);
     } else if (typeof (singleParam.children) !== 'undefined' && null !== singleParam.children && singleParam.children.length > 0) {
       initialValue = [buildObjectInitVal(singleParam)];
@@ -73,7 +76,7 @@ export function buildBodyParamInitValue(bodyName, consumesIsJson, paramList) {
   }
   let codeVal = JSON.stringify(obj, null, 4);
   if (!consumesIsJson) {
-    codeVal = convert.json2xml(obj, { compact: true, ignoreComment: true, spaces: 4 });
+    codeVal = convert.json2xml(obj, {compact: true, ignoreComment: true, spaces: 4});
   }
   return codeVal
 }
