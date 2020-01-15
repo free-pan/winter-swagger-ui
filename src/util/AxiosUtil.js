@@ -18,6 +18,7 @@ const errorHandler = function (error) {
     console.log(error.data);
     console.log(error.request);
     console.log(codeMap[error.data.status])
+    return {response: error.data}
   } else {
     // 请求初始化时出错或者没有响应返回的异常
     console.log(error.message);
@@ -26,7 +27,7 @@ const errorHandler = function (error) {
   // throw error;   // 如果throw. 错误将继续抛出.
 
   // 如果return, 则将值作为返回. 'return;' 相当于return undefined, 在处理结果时判断response是否有值即可.
-  return ;
+  return;
 }
 
 const extendRequest = extend({timeout: defaultTimeout * 1000, errorHandler, getResponse: true})
@@ -90,7 +91,14 @@ export default {
    * @returns {Promise<any>}
    */
   formPatch(url, data = {}, {useCache = false, timeout = defaultTimeout, headers = {}, getResponse = false} = {}) {
-    return extendRequest.patch(url, {data, headers, timeout: timeout * 1000, useCache, requestType: 'form', getResponse})
+    return extendRequest.patch(url, {
+      data,
+      headers,
+      timeout: timeout * 1000,
+      useCache,
+      requestType: 'form',
+      getResponse
+    })
   },
 
   /**
@@ -103,7 +111,14 @@ export default {
    * @param getResponse {boolean} 是否包含响应头信息. 默认:false
    */
   bodyPatch(url, data = {}, {useCache = false, timeout = defaultTimeout, headers = {}, getResponse = false} = {}) {
-    return extendRequest.patch(url, {data, headers, timeout: timeout * 1000, useCache, requestType: 'json', getResponse})
+    return extendRequest.patch(url, {
+      data,
+      headers,
+      timeout: timeout * 1000,
+      useCache,
+      requestType: 'json',
+      getResponse
+    })
   },
 
   /**

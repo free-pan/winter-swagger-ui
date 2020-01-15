@@ -1,23 +1,24 @@
-import { hashHistory } from 'dva/router';
+import {hashHistory} from 'dva/router';
 import request from 'umi-request';
 
 import swaggerDocConvert from '@/util/project/DocServerDataConvertHelp'
 import menuItemSearch from '@/util/project/MenuItemSearchHelp'
 import swaggerDocBasicInfoConvert from '@/util/project/SwaggerDocBasicInfoConvert'
 import WinterUtil from "../util/WinterUtil";
-import { notification, message } from 'antd';
+import {notification, message} from 'antd';
 
 /**
  * 从远程服务器上获取swagger文档
  * @param swaggerDocUrl swagger文档地址
  * @return {Promise<any>}
  */
-async function loadSwaggerDocFromServer({ swaggerDocUrl }) {
+async function loadSwaggerDocFromServer({swaggerDocUrl}) {
   return request.get(swaggerDocUrl).catch(function (error) {
     notification['error']({
       message: 'swagger文档获取异常',
       description: error.message,
     });
+    throw error
   })
 }
 
@@ -53,39 +54,44 @@ export default {
      * @param call 用于发起对自定义函数的调用
      * @param put 用于发起对dva reducer 方法的调用
      * @return {IterableIterator<*>}
-     */* query({ httpType, swaggerUri, apiKey, kw }, { select, call, put }) {
+     */* query({httpType, swaggerUri, apiKey, kw}, {select, call, put}) {
       const closeCall = message.loading('正在获取swagger文档...', 0)
-      const realHttpType = yield select(state => state.GlobalModel.httpTypeMap[httpType])
-      setTimeout(() => {
-        closeCall()
-        message.success('swagger文档获取成功!', 2)
-      }, 400);
-      const swaggerDocUrl = realHttpType + swaggerUri
-      const resp = yield call(loadSwaggerDocFromServer, { swaggerDocUrl })
-      yield put({
-        type: 'swaggerDocLoadSuc',
-        resp, httpType, kw
-      })
-      if (WinterUtil.strNotBlank(apiKey)) {
+      try {
+        const realHttpType = yield select(state => state.GlobalModel.httpTypeMap[httpType])
+        const swaggerDocUrl = realHttpType + swaggerUri
+        const resp = yield call(loadSwaggerDocFromServer, {swaggerDocUrl})
+        setTimeout(() => {
+          closeCall()
+          message.success('swagger文档获取成功!', 2)
+        }, 400)
         yield put({
-          type: 'searchApiDetail',
-          apiKey: apiKey
+          type: 'swaggerDocLoadSuc',
+          resp, httpType, kw
         })
+        if (WinterUtil.strNotBlank(apiKey)) {
+          yield put({
+            type: 'searchApiDetail',
+            apiKey: apiKey
+          })
+        }
+      } catch (e) {
+        closeCall()
       }
+
     },
   },
   reducers: {
-    updateGlobalHeaderArr(state, { globalHeaderArr, globalHeaderCount }) {
-      return { ...state, globalHeaderArr, globalHeaderCount }
+    updateGlobalHeaderArr(state, {globalHeaderArr, globalHeaderCount}) {
+      return {...state, globalHeaderArr, globalHeaderCount}
     },
-    apiSearch(state, { kw }) {
+    apiSearch(state, {kw}) {
       const {
         queriedApiInfoMap,
         openedKeys
       } = menuItemSearch(state.swaggerDoc, kw)
-      return { ...state, kw, queriedApiInfoMap, openedKeys }
+      return {...state, kw, queriedApiInfoMap, openedKeys}
     },
-    searchApiDetail(state, { apiKey }) {
+    searchApiDetail(state, {apiKey}) {
       let apiDetail = null;
       let openedKey = null;
       for (const tagName in state.swaggerDoc) {
@@ -110,9 +116,9 @@ export default {
           openedKeys.push(openedKey)
         }
       }
-      return { ...state, apiDetail, selectedKey: apiKey, openedKeys }
+      return {...state, apiDetail, selectedKey: apiKey, openedKeys}
     },
-    swaggerDocLoadSuc(state, { resp, httpType, kw }) {
+    swaggerDocLoadSuc(state, {resp, httpType, kw}) {
       const swaggerDoc = swaggerDocConvert(resp)
       const swaggerDocBasicInfo = swaggerDocBasicInfoConvert(resp)
       let newQueriedApiInfoMap;
@@ -125,7 +131,7 @@ export default {
         newOpenedKeys = openedKeys
         newQueriedApiInfoMap = queriedApiInfoMap
       } else {
-        newQueriedApiInfoMap = { ...swaggerDoc }
+        newQueriedApiInfoMap = {...swaggerDoc}
         newOpenedKeys = []
       }
       return {
@@ -137,14 +143,14 @@ export default {
         openedKeys: newOpenedKeys
       }
     },
-    updateKw(state, { kw }) {
-      return { ...state, kw }
+    updateKw(state, {kw}) {
+      return {...state, kw}
     },
-    updateOpenedKeys(state, { openedKeys }) {
-      return { ...state, openedKeys: [...openedKeys] }
+    updateOpenedKeys(state, {openedKeys}) {
+      return {...state, openedKeys: [...openedKeys]}
     },
-    updateHttpType(state, { httpType }) {
-      return { ...state, httpType }
+    updateHttpType(state, {httpType}) {
+      return {...state, httpType}
     },
     /*
     * 控制加载状态的 reducer
@@ -156,7 +162,7 @@ export default {
      * 使用静态数据返回
      */
     querySuccess(state) {
-      return { ...state, loading: false };
+      return {...state, loading: false};
     }
   }
 }

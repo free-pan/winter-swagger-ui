@@ -1,10 +1,10 @@
-import React, { PureComponent } from 'react';
+import React, {PureComponent} from 'react';
 import PropTypes from 'prop-types';
 
 // 将json转为FormData
-import { objectToForm } from 'object-to-form';
+import {objectToForm} from 'object-to-form';
 
-import { message as antdMessage, Form, Upload, Button, Icon } from 'antd'
+import {message as antdMessage, notification, Form, Upload, Button, Icon} from 'antd'
 
 import ApiTestFormParamPart from './ApiTestFormParamPart'
 import ApiTestFormNormalFormParamPart from './ApiTestFormNormalFormParamPart'
@@ -22,6 +22,15 @@ class ApiTestForm extends PureComponent {
     apiExecute: false
   }
 
+  componentDidUpdate(prevProps, prevState) {
+    if (prevProps.apiDetail !== this.props.apiDetail) {
+      // 如果上一个apiDetail和当前的apiDetail不是同一个，则清除response codemirror中的内容
+      if (this.responseCodeMirrorEditorWrapper) {
+        this.responseCodeMirrorEditorWrapper.setWinterCodemirrorValue('')
+      }
+    }
+  }
+
   /**
    * 删除对象的属性值为空或null的属性
    * @param tmpObj
@@ -36,13 +45,13 @@ class ApiTestForm extends PureComponent {
   }
 
   createFileUploadFormItem = (title, paramList) => {
-    const { getFieldDecorator } = this.props.form;
+    const {getFieldDecorator} = this.props.form;
     const formItemArr = [];
     if (paramList && paramList.length > 0) {
 
       const fileUploadProps = {
         onRemove: (file) => {
-          this.setState(({ fileList }) => {
+          this.setState(({fileList}) => {
             const index = fileList.indexOf(file);
             const newFileList = fileList.slice();
             newFileList.splice(index, 1);
@@ -52,7 +61,7 @@ class ApiTestForm extends PureComponent {
           });
         },
         beforeUpload: (file) => {
-          this.setState(({ fileList }) => ({
+          this.setState(({fileList}) => ({
             fileList: [...fileList, file],
           }));
           return false;
@@ -60,18 +69,18 @@ class ApiTestForm extends PureComponent {
         fileList: this.state.fileList
       };
       formItemArr.push(
-        <Upload { ...fileUploadProps } key={ 1 }>
-          <Button size={ 'small' }>
+        <Upload {...fileUploadProps} key={1}>
+          <Button size={'small'}>
             <Icon type="upload"/> <FormattedMessage id="select_file"/>
           </Button>
         </Upload>
       );
       return (
         <div>
-          <h3 className={ styles.header }>
-            { title }
+          <h3 className={styles.header}>
+            {title}
           </h3>
-          { formItemArr }
+          {formItemArr}
         </div>
       )
     }
@@ -110,47 +119,60 @@ class ApiTestForm extends PureComponent {
         this.responseCodeMirrorEditorWrapper.setWinterCodemirrorValue('服务器未给出任何响应. \r\n可能的原因: \r\n1.网络异常. \r\n2.服务器响应超时 \r\n3.客户端的超时时间设置过短 \r\n4.测试地址错误 \r\n5.后端服务未开启跨域支持')
       }
     } else {
-      const { data, response } = result
-      if (response.status >= 200) {
+      const {data, response} = result
+      if (response.status === 200 || response.status === 201) {
         antdMessage.info(testApiUrl + '   ===>  http响应状态码: ' + response.status);
-      } else {
-        antdMessage.error(testApiUrl + '  ===>  http响应状态码: ' + response.status, 10);
-        this.setState({
-          apiExecute: false
-        })
-      }
-      let isBinaryResult = this.isBinaryResult(response.headers['content-type']);
-      if (isBinaryResult) {
-        let url = window.URL.createObjectURL(new Blob([data]));
-        let link = document.createElement('a');
-        link.href = url;
-        let fileName = '后台返回的下载文件(未在content-disposition中找到文件名)';
-        if (response.headers['content-disposition']) {
-          let tmp = response.headers['content-disposition'].replace(new RegExp("attachment;filename=", 'gm'), "");
-          if ('' !== tmp) {
-            fileName = decodeURI(tmp);
+        let isBinaryResult = this.isBinaryResult(response.headers['content-type']);
+        if (isBinaryResult) {
+          let url = window.URL.createObjectURL(new Blob([data]));
+          let link = document.createElement('a');
+          link.href = url;
+          let fileName = '后台返回的下载文件(未在content-disposition中找到文件名)';
+          if (response.headers['content-disposition']) {
+            let tmp = response.headers['content-disposition'].replace(new RegExp("attachment;filename=", 'gm'), "");
+            if ('' !== tmp) {
+              fileName = decodeURI(tmp);
+            }
+          }
+          link.setAttribute('download', fileName);
+          link.setAttribute('id', 'real-download-file');
+          link.textContent = fileName;
+          let oldLink = document.getElementById('real-download-file');
+          if (oldLink) {
+            oldLink.remove();
+          }
+          document.getElementById('download-file').appendChild(link);
+          this.setState({
+            apiExecute: false
+          })
+        } else {
+          this.setState({
+            apiExecute: false
+          })
+          if (this.responseCodeMirrorEditorWrapper) {
+            this.responseCodeMirrorEditorWrapper.setWinterCodemirrorValue(JSON.stringify(data, null, 4))
           }
         }
-        link.setAttribute('download', fileName);
-        link.setAttribute('id', 'real-download-file');
-        link.textContent = fileName;
-        let oldLink = document.getElementById('real-download-file');
-        if (oldLink) {
-          oldLink.remove();
-        }
-        document.getElementById('download-file').appendChild(link);
-        this.setState({
-          apiExecute: false
-        })
       } else {
+        antdMessage.error(testApiUrl + ' ==> http响应状态码: ' + response.status + ', 错误信息:' + response.error, 10);
         this.setState({
           apiExecute: false
         })
-        if (this.responseCodeMirrorEditorWrapper) {
-          this.responseCodeMirrorEditorWrapper.setWinterCodemirrorValue(JSON.stringify(data, null, 4))
-        }
       }
     }
+  }
+
+  /**
+   * 提取有效的全局请求头，并将数组结构转换为对象结构
+   */
+  extractValidGlobalHeader = (globalHeaderArr) => {
+    const globalHeader = {}
+    for (const globalHeaderSingle of globalHeaderArr) {
+      if (WinterUtil.strNotBlank(globalHeaderSingle.val) && WinterUtil.strNotBlank(globalHeaderSingle.name)) {
+        globalHeader[globalHeaderSingle.name.trim()] = globalHeaderSingle.val.trim()
+      }
+    }
+    return globalHeader
   }
 
   onSubmitForm = (e) => {
@@ -158,8 +180,9 @@ class ApiTestForm extends PureComponent {
     this.setState({
       apiExecute: true
     })
-    const { apiDetail, httpType, form, testApiFullUrl } = this.props
-    const { fileParams, produces, consumes, method } = apiDetail
+    const {apiDetail, httpType, form, testApiFullUrl, globalHeaderArr} = this.props
+    const {fileParams, produces, consumes, method} = apiDetail
+    const realGlobalHeader = this.extractValidGlobalHeader(globalHeaderArr)
 
     let accept = "application/json";
     let isBinaryResult = false;
@@ -206,16 +229,16 @@ class ApiTestForm extends PureComponent {
           }
         }
 
-        const { __path, __header, __form, __bodyForm } = values
+        const {__path, __header, __form, __bodyForm} = values
         console.log(values);//__path, __header, __form, __bodyForm
 
         // 构建请求头参数
         let headers = values['__header'];
         if (!isUpload) {
           if (headers) {
-            headers = { ...headers, Accept: accept, 'Content-Type': contentType }
+            headers = {...realGlobalHeader, ...headers, Accept: accept, 'Content-Type': contentType}
           } else {
-            headers = { Accept: accept, 'Content-Type': contentType }
+            headers = {...realGlobalHeader, Accept: accept, 'Content-Type': contentType}
           }
         }
 
@@ -225,7 +248,7 @@ class ApiTestForm extends PureComponent {
         const that = this
         if (upperMethod === 'POST') {
           if (isUpload) {
-            const { fileList } = this.state
+            const {fileList} = this.state
             // post文件上传
             let previousFormData = new FormData();
             let idx = 0
@@ -237,13 +260,13 @@ class ApiTestForm extends PureComponent {
             let formData = objectToForm(normalFormData, previousFormData);
 
 
-            apiRemoteService.postUpload(realApiTestUrl, formData, __header).then(function (result) {
+            apiRemoteService.postUpload(realApiTestUrl, formData, {...realGlobalHeader, ...__header}).then(function (result) {
               that.printResponse(realApiTestUrl, result)
             });
           } else if (__bodyForm) {
             if (isBinaryResult) {
               // 这个实际上是post文件下载
-              apiRemoteService.normalBodyDownloadPost(realApiTestUrl, __bodyForm, __header).then(function (result) {
+              apiRemoteService.normalBodyDownloadPost(realApiTestUrl, __bodyForm, {...realGlobalHeader, ...__header}).then(function (result) {
                 that.printResponse(realApiTestUrl, result)
               });
             } else {
@@ -255,7 +278,7 @@ class ApiTestForm extends PureComponent {
           } else {
             // post使用普通的表单传参
             const tmpObj = this.removeEmptyValueField(__form)
-            apiRemoteService.normalGet(realApiTestUrl, tmpObj, headers).then(function (result) {
+            apiRemoteService.normalFormPost(realApiTestUrl, tmpObj, headers).then(function (result) {
               that.printResponse(realApiTestUrl, result)
             });
           }
@@ -325,41 +348,41 @@ class ApiTestForm extends PureComponent {
 
   render() {
     console.log('ApiTestForm')
-    const { testApiFullUrl, apiDetail, swaggerDocBasicInfo, form } = this.props
+    const {testApiFullUrl, apiDetail, swaggerDocBasicInfo, form} = this.props
     return (
-      <div className={ styles.container }>
-        <Form onSubmit={ this.onSubmitForm }>
+      <div className={styles.container}>
+        <Form onSubmit={this.onSubmitForm}>
           <ApiTestFormParamPart
-            paramNamePrefix={ '__path.' }
-            title={ '路径参数' }
-            form={ form }
-            paramList={ apiDetail.pathParams }/>
+            paramNamePrefix={'__path.'}
+            title={'路径参数'}
+            form={form}
+            paramList={apiDetail.pathParams}/>
           <ApiTestFormParamPart
-            paramNamePrefix={ '__header.' }
-            title={ '请求头参数' }
-            form={ form }
-            paramList={ apiDetail.headerParams }/>
+            paramNamePrefix={'__header.'}
+            title={'请求头参数'}
+            form={form}
+            paramList={apiDetail.headerParams}/>
           <ApiTestFormNormalFormParamPart
-            paramNamePrefix={ '__form.' }
-            title={ '表单参数' }
-            form={ form }
-            paramList={ apiDetail.formParams }/>
+            paramNamePrefix={'__form.'}
+            title={'表单参数'}
+            form={form}
+            paramList={apiDetail.formParams}/>
 
-          { this.createFileUploadFormItem('文件参数', apiDetail.fileParams) }
+          {this.createFileUploadFormItem('文件参数', apiDetail.fileParams)}
 
           <ApiTestFormBodyParamPart
-            title={ '请求体参数' }
-            apiDetail={ apiDetail }
-            onMounted={ this.onApiTestFormBodyParamPartMounted }
+            title={'请求体参数'}
+            apiDetail={apiDetail}
+            onMounted={this.onApiTestFormBodyParamPartMounted}
           />
 
-          <Button type="primary" htmlType="submit" block style={ { marginTop: 10 } }
-                  loading={ this.state.apiExecute }>
+          <Button type="primary" htmlType="submit" block style={{marginTop: 10}}
+                  loading={this.state.apiExecute}>
             执行
           </Button>
         </Form>
 
-        <ApiTestResponse onMounted={ this.onApiTestResponseMounted }/>
+        <ApiTestResponse onMounted={this.onApiTestResponseMounted}/>
       </div>
     );
   }
@@ -368,7 +391,11 @@ class ApiTestForm extends PureComponent {
 ApiTestForm.propTypes = {
   testApiFullUrl: PropTypes.string,
   apiDetail: PropTypes.object,
-  swaggerDocBasicInfo: PropTypes.object
+  swaggerDocBasicInfo: PropTypes.object,
+  /**
+   * 全局请求头
+   */
+  globalHeaderArr: PropTypes.array.isRequired
 };
 
 export default ApiTestForm;

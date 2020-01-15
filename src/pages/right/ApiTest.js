@@ -1,4 +1,4 @@
-import React, { Component, PureComponent } from 'react';
+import React, {Component, PureComponent} from 'react';
 import PropTypes from 'prop-types';
 
 import ApiTestForm from './ApiTestForm'
@@ -48,21 +48,21 @@ class ApiTest extends Component {
 
   render() {
     console.log('ApiTest')
-    const { apiDetail, httpTypeMap, httpType, swaggerDocBasicInfo } = this.props
+    const {apiDetail, httpTypeMap, httpType, swaggerDocBasicInfo, globalHeaderArr} = this.props
     if (apiDetail) {
       const basePath = swaggerDocBasicInfo.host + swaggerDocBasicInfo.basePath;
       const testApiFullUrl = this.buildFullApiUrl(httpType, basePath, apiDetail.path)
-      const propsApiTestForm = { testApiFullUrl, apiDetail, swaggerDocBasicInfo }
+      const propsApiTestForm = {testApiFullUrl, apiDetail, swaggerDocBasicInfo, globalHeaderArr}
       return (
         <div>
           <h3>
             <strong
-              className={ methodColorMap[apiDetail.method.toUpperCase()] }
-              style={ { marginRight: '10px' } }>{ apiDetail.method ? apiDetail.method.toUpperCase() : '' }</strong>
+              className={methodColorMap[apiDetail.method.toUpperCase()]}
+              style={{marginRight: '10px'}}>{apiDetail.method ? apiDetail.method.toUpperCase() : ''}</strong>
             <span
-              style={ { wordWrap: "break-word" } }>{ testApiFullUrl }</span>
+              style={{wordWrap: "break-word"}}>{testApiFullUrl}</span>
           </h3>
-          <ApiTestForm { ...propsApiTestForm }/>
+          <ApiTestForm {...propsApiTestForm}/>
         </div>
       )
     } else {
@@ -75,7 +75,11 @@ ApiTest.propTypes = {
   apiDetail: PropTypes.object,
   swaggerDocBasicInfo: PropTypes.object,
   httpTypeMap: PropTypes.object,
-  httpType: PropTypes.string
+  httpType: PropTypes.string,
+  /**
+   * 全局请求头
+   */
+  globalHeaderArr: PropTypes.array.isRequired
 };
 
 export default ApiTest;

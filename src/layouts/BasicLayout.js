@@ -1,8 +1,8 @@
-import React, { Component } from 'react'
-import { connect } from 'dva';
+import React, {Component} from 'react'
+import {connect} from 'dva';
 
 import router from 'umi/router'
-import { Tabs, Input, Row, Col } from 'antd'
+import {Tabs, Input, Row, Col} from 'antd'
 
 import SwaggerSearch from '@/pages/top/SwaggerSearch'
 import ApiList from '@/pages/right/ApiList'
@@ -15,11 +15,11 @@ import styles from './BasicLayout.less'
 import validateUrlIsSame from '@/util/UrlValidateUtil'
 
 
-const { TabPane } = Tabs
-const { Search } = Input
+const {TabPane} = Tabs
+const {Search} = Input
 
-function mapStateToProps({ GlobalModel }) {
-  return { GlobalModel };
+function mapStateToProps({GlobalModel}) {
+  return {GlobalModel};
 }
 
 class BasicLayout extends Component {
@@ -33,8 +33,8 @@ class BasicLayout extends Component {
   }
 
   componentDidMount() {
-    const { query } = this.props.location
-    const { httpType, swaggerUri } = query
+    const {query} = this.props.location
+    const {httpType, swaggerUri} = query
     if (httpType && swaggerUri) {
       this.props.dispatch({
         ...query,
@@ -49,19 +49,19 @@ class BasicLayout extends Component {
   }
 
   onTabChange = (activeKey) => {
-    this.setState({ activeKey })
+    this.setState({activeKey})
   }
 
-  onSearchSwaggerDoc = ({ swaggerUri, httpType }) => {
-    const { dispatch, location } = this.props
-    const { query, pathname } = location
+  onSearchSwaggerDoc = ({swaggerUri, httpType}) => {
+    const {dispatch, location} = this.props
+    const {query, pathname} = location
     dispatch({
       type: 'GlobalModel/query',
       httpType, swaggerUri, kw: query.kw
     })
     const urlIsSame = validateUrlIsSame(
-      { ...query, pathname: pathname },
-      { httpType: httpType, swaggerUri: swaggerUri, pathname: '/index' }
+      {...query, pathname: pathname},
+      {httpType: httpType, swaggerUri: swaggerUri, pathname: '/index'}
     )
     if (!urlIsSame) {
       router.push({
@@ -76,15 +76,15 @@ class BasicLayout extends Component {
   }
 
   onSearch = (value) => {
-    const { dispatch, location } = this.props
+    const {dispatch, location} = this.props
     dispatch({
       type: 'GlobalModel/apiSearch',
       kw: value
     })
-    const { query, pathname } = location
+    const {query, pathname} = location
     const urlIsSame = validateUrlIsSame(
-      { ...query, pathname: pathname },
-      { ...query, pathname: pathname, kw: value }
+      {...query, pathname: pathname},
+      {...query, pathname: pathname, kw: value}
     )
     if (!urlIsSame) {
       router.push({
@@ -97,18 +97,18 @@ class BasicLayout extends Component {
     }
   }
 
-  onMenuItemSelected = ({ item, key, keyPath, selectedKeys, domEvent }) => {
-    const { dispatch, location } = this.props
+  onMenuItemSelected = ({item, key, keyPath, selectedKeys, domEvent}) => {
+    const {dispatch, location} = this.props
     dispatch({
       type: 'GlobalModel/searchApiDetail',
       apiKey: key
     })
-    const { query, pathname } = location
+    const {query, pathname} = location
     const urlIsSame = validateUrlIsSame(
       {
         ...query, pathname: pathname
       },
-      { ...query, pathname: '/detail', apiKey: key }
+      {...query, pathname: '/detail', apiKey: key}
     )
     if (!urlIsSame) {
       router.push({
@@ -121,15 +121,39 @@ class BasicLayout extends Component {
     }
   }
 
+  onGlobalHeaderTableCellSave = (globalHeaderArr, globalHeaderCount) => {
+    const {dispatch} = this.props
+    dispatch({
+      type: 'GlobalModel/updateGlobalHeaderArr',
+      globalHeaderArr, globalHeaderCount
+    })
+  }
+
+  onGlobalHeaderTableRowAdd = (globalHeaderArr, globalHeaderCount) => {
+    const {dispatch} = this.props
+    dispatch({
+      type: 'GlobalModel/updateGlobalHeaderArr',
+      globalHeaderArr, globalHeaderCount
+    })
+  }
+
+  onGlobalHeaderTableRowDelete = (globalHeaderArr, globalHeaderCount) => {
+    const {dispatch} = this.props
+    dispatch({
+      type: 'GlobalModel/updateGlobalHeaderArr',
+      globalHeaderArr, globalHeaderCount
+    })
+  }
+
   render() {
     console.log('BasicLayout')
-    const { GlobalModel, children, location } = this.props
-    const { query } = location
+    const {GlobalModel, children, location} = this.props
+    const {query} = location
 
-    const { activeKey } = this.state
+    const {activeKey} = this.state
 
-    const { swaggerUri } = query
-    const { httpTypeMap, globalHeaderArr, globalHeaderCount, queriedApiInfoMap, apiDetail, openedKeys, swaggerDocBasicInfo } = GlobalModel
+    const {swaggerUri} = query
+    const {httpTypeMap, globalHeaderArr, globalHeaderCount, queriedApiInfoMap, apiDetail, openedKeys, swaggerDocBasicInfo} = GlobalModel
     const httpType = query.httpType ? query.httpType : GlobalModel.httpType
 
     const propsSwaggerSearch = {
@@ -139,7 +163,7 @@ class BasicLayout extends Component {
       onSearchSwaggerDoc: this.onSearchSwaggerDoc
     }
 
-    const propsSearch = { defaultValue: query.kw }
+    const propsSearch = {defaultValue: query.kw}
 
     const propsApiList = {
       show: activeKey === 'ApiList',
@@ -148,48 +172,62 @@ class BasicLayout extends Component {
       onMenuItemSelected: this.onMenuItemSelected
     }
 
-    const propsApiTest = { show: activeKey === 'ApiTest', apiDetail, swaggerDocBasicInfo, httpType, httpTypeMap }
+    const propsApiTest = {
+      show: activeKey === 'ApiTest',
+      apiDetail,
+      swaggerDocBasicInfo,
+      httpType,
+      httpTypeMap,
+      globalHeaderArr
+    }
 
-    const propsGlobalHeader = { show: activeKey === 'GlobalHeader', globalHeaderArr, globalHeaderCount }
+    const propsGlobalHeader = {
+      show: activeKey === 'GlobalHeader',
+      globalHeaderArr,
+      globalHeaderCount,
+      onTableCellSave: this.onGlobalHeaderTableCellSave,
+      onTableRowAdd: this.onGlobalHeaderTableRowAdd,
+      onTableRowDelete: this.onGlobalHeaderTableRowDelete
+    }
 
-    const propsDocSummary = { show: activeKey === 'DocSummary' }
+    const propsDocSummary = {show: activeKey === 'DocSummary'}
 
-    const propsAboutAuthor = { show: activeKey === 'AboutAuthor' }
+    const propsAboutAuthor = {show: activeKey === 'AboutAuthor'}
 
     return (
-      <div className={ styles.container }>
+      <div className={styles.container}>
         <Row>
-          <Col span={ 14 }>
-            <div className={ styles.top }>
-              <SwaggerSearch { ...propsSwaggerSearch }/>
+          <Col span={14}>
+            <div className={styles.top}>
+              <SwaggerSearch {...propsSwaggerSearch}/>
             </div>
-            <div className={ styles.center }>
-              { children }
+            <div className={styles.center}>
+              {children}
             </div>
           </Col>
-          <Col span={ 10 }>
-            <div className={ styles.right }>
-              <Tabs activeKey={ activeKey } onChange={ this.onTabChange }>
-                <TabPane tab="API列表" key="ApiList">
+          <Col span={10}>
+            <div className={styles.right}>
+              <Tabs activeKey={activeKey} onChange={this.onTabChange}>
+                <TabPane tab="接口列表" key="ApiList">
                   <Search
-                    onSearch={ this.onSearch }
-                    placeholder={ '请输入关键词搜索...' }
-                    style={ { marginBottom: '10px' } }
-                    { ...propsSearch }
+                    onSearch={this.onSearch}
+                    placeholder={'请输入关键词搜索...'}
+                    style={{marginBottom: '10px'}}
+                    {...propsSearch}
                   />
-                  <ApiList { ...propsApiList }/>
+                  <ApiList {...propsApiList}/>
                 </TabPane>
                 <TabPane tab="测试" key="ApiTest">
-                  <ApiTest { ...propsApiTest }/>
+                  <ApiTest {...propsApiTest}/>
                 </TabPane>
                 <TabPane tab="全局请求头" key="GlobalHeader">
-                  <GlobalHeader { ...propsGlobalHeader }/>
+                  <GlobalHeader {...propsGlobalHeader}/>
                 </TabPane>
                 <TabPane tab="文档概况" key="DocSummary">
-                  <DocSummary { ...propsDocSummary } />
+                  <DocSummary {...propsDocSummary} />
                 </TabPane>
                 <TabPane tab="关于" key="AboutAuthor">
-                  <AboutAuthor { ...propsAboutAuthor }/>
+                  <AboutAuthor {...propsAboutAuthor}/>
                 </TabPane>
               </Tabs>
             </div>
