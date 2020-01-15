@@ -167,6 +167,7 @@ class BasicLayout extends Component {
 
     const propsApiList = {
       show: activeKey === 'ApiList',
+      defaultSelectedKey: query.apiKey,
       queriedApiInfoMap,
       openedKeys,
       onMenuItemSelected: this.onMenuItemSelected
