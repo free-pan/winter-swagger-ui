@@ -7,7 +7,7 @@ const Index = (props) => {
     <div className={'index-container'}>
       <h2>Swagger UI Theme</h2>
       <h3>
-        简洁、直观、强悍的Swagger主题, 让API文档的查阅与测试更便捷、简单.
+        简洁、直观、强悍的Swagger主题, 让API的查阅与测试更便捷、简单.
       </h3>
       <Button type={'primary'} size={'large'}
               className={'load-source-btn'}
