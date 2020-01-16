@@ -29,12 +29,14 @@ class DocSummary extends Component {
             <Col span={12}><strong>负责人:</strong><span>{name}</span></Col>
             <Col span={12}><strong>版本:</strong><span>{version}</span></Col>
           </Row>
-          <Row>
-            <Col span={12}><strong>swagger:</strong><span>{swagger}</span></Col>
-            <Col span={12}><strong>host:</strong><span>{host}</span></Col>
-          </Row>
-          <Divider orientation="left" dashed={true}>详述</Divider>
-          <ReactMarkdown source={description} escapeHtml={false}/>
+          <div style={{height: 'calc(100vh - 200px)', overflow: 'auto'}}>
+            <Row>
+              <Col span={12}><strong>swagger:</strong><span>{swagger}</span></Col>
+              <Col span={12}><strong>host:</strong><span>{host}</span></Col>
+            </Row>
+            <Divider orientation="left" dashed={true}>详述</Divider>
+            <ReactMarkdown source={description} escapeHtml={false}/>
+          </div>
         </div>
       )
     } else {

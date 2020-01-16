@@ -175,15 +175,17 @@ class GlobalHeader extends Component {
         <Button onClick={this.handleAdd} type="primary" style={{marginBottom: 8, width: '100%'}}>
           新增
         </Button>
-        <Table
-          pagination={false}
-          size={'small'}
-          components={components}
-          rowClassName={() => 'editable-row'}
-          bordered
-          dataSource={globalHeaderArr}
-          columns={columns}
-        />
+        <div style={{height: 'calc(100vh - 150px)', overflow: 'auto'}}>
+          <Table
+            pagination={false}
+            size={'small'}
+            components={components}
+            rowClassName={() => 'editable-row'}
+            bordered
+            dataSource={globalHeaderArr}
+            columns={columns}
+          />
+        </div>
       </div>
     )
   }
