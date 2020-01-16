@@ -19,7 +19,8 @@ import WinterUtil from '@/util/WinterUtil'
 class ApiTestForm extends PureComponent {
 
   state = {
-    apiExecute: false
+    apiExecute: false,
+    fileList: []
   }
 
   componentDidUpdate(prevProps, prevState) {
@@ -71,7 +72,7 @@ class ApiTestForm extends PureComponent {
       formItemArr.push(
         <Upload {...fileUploadProps} key={1}>
           <Button size={'small'}>
-            <Icon type="upload"/> <FormattedMessage id="select_file"/>
+            <Icon type="upload"/> 选择文件
           </Button>
         </Upload>
       );
@@ -300,6 +301,7 @@ class ApiTestForm extends PureComponent {
           } else {
             // 普通get提交
             const tmpObj = this.removeEmptyValueField(__form)
+            console.log('tmpObj',tmpObj)
             apiRemoteService.normalGet(realApiTestUrl, tmpObj, headers).then(function (result) {
               that.printResponse(realApiTestUrl, result)
             });

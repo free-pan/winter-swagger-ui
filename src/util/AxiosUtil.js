@@ -30,7 +30,7 @@ const errorHandler = function (error) {
   return;
 }
 
-const extendRequest = extend({timeout: defaultTimeout * 1000, errorHandler, getResponse: true})
+const extendRequest = extend({timeout: defaultTimeout * 1000, errorHandler, getResponse: true, credentials: 'include'})
 export default {
   /**
    * 普通的form表单提交方式
@@ -192,7 +192,7 @@ export default {
     return extendRequest.get(url, {
       useCache,
       getResponse,
-      data,
+      params: data,
       timeout: timeout * 1000,
       headers
     })
