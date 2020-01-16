@@ -46,6 +46,7 @@ class ApiTestFormBodyParamPart extends PureComponent {
       const {bodyParams, consumes, bodyName} = this.props.apiDetail
       const consumesIsJson = this.consumesIsJson(consumes)
       const initValue = buildBodyParamInitValue(bodyName, consumesIsJson, bodyParams)
+      console.log('bodyParams',bodyParams,consumesIsJson,initValue)
       if (this.editor) {
         this.editor.setValue(initValue)
       }

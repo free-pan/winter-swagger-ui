@@ -351,6 +351,7 @@ class ApiTestForm extends PureComponent {
   render() {
     console.log('ApiTestForm')
     const {testApiFullUrl, apiDetail, swaggerDocBasicInfo, form} = this.props
+    console.log('apiDetail',apiDetail)
     return (
       <div className={styles.container}>
         <Form onSubmit={this.onSubmitForm}>

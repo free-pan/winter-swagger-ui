@@ -4,7 +4,7 @@
  * @return {*}
  */
 export function buildInitialValue(singleParam) {
-  return singleParam.default === '' ? singleParam.example : singleParam.default
+  return singleParam.default ? singleParam.default : singleParam.example ? singleParam.example : ''
 }
 
 /**
@@ -55,11 +55,12 @@ export function buildBodyParamInitValue(bodyName, consumesIsJson, paramList) {
     let initialValue;
     if (singleParam.type === 'boolean') {
       initialValue = buildObjectInitVal(singleParam);
-    }else if (singleParam.type === 'object') {
+    } else if (singleParam.type === 'object') {
       initialValue = buildObjectInitVal(singleParam);
     } else if (typeof (singleParam.children) !== 'undefined' && null !== singleParam.children && singleParam.children.length > 0) {
       initialValue = [buildObjectInitVal(singleParam)];
     } else {
+      console.log('singleParam', singleParam)
       initialValue = buildInitialValue(singleParam);
       if (initialValue === "" && 'undefined' !== typeof (singleParam.type) && null !== singleParam.type && singleParam.type.startsWith("array")) {
         initialValue = [];
@@ -67,6 +68,8 @@ export function buildBodyParamInitValue(bodyName, consumesIsJson, paramList) {
     }
     reqData[paramName] = initialValue;
   }
+
+  console.log('reqData', reqData)
 
   let obj = {};
   if (consumesIsJson) {

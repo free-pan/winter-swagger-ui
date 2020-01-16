@@ -51,7 +51,6 @@ class BasicLayout extends Component {
   onTabChange = (activeKey) => {
     const {GlobalModel} = this.props
     const {swaggerDoc, apiDetail} = GlobalModel
-    console.log(GlobalModel, swaggerDoc)
     if (swaggerDoc) {
       if (activeKey === 'ApiTest' && !apiDetail) {
         message.info('请先选择一个API!')
