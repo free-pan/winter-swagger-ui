@@ -9,21 +9,29 @@ const Index = (props) => {
       <h3>
         简洁、直观、强悍的Swagger主题, 让API的查阅与测试更便捷、简单.
       </h3>
-      <Button type={'primary'} size={'large'}
-              className={'load-source-btn'}
-              style={{
-                marginTop: '15px',
-                boxShadow: 'inset 0 -4px 0 #23527c',
-                background: '#337ab7',
-                border: 0,
-                width: '40%',
-                height: '50px',
-                transition: 'all .2s ease-in-out',
-                borderRadius: '6px'
-              }}
+      <Button
+        onClick={()=>{
+          window.open('https://gitee.com/free_pan/swagger-ui-theme')
+        }}
+        type={'primary'} size={'large'}
+        className={'load-source-btn'}
+        style={{
+          marginTop: '15px',
+          boxShadow: 'inset 0 -4px 0 #23527c',
+          background: '#337ab7',
+          border: 0,
+          width: '40%',
+          height: '50px',
+          transition: 'all .2s ease-in-out',
+          borderRadius: '6px'
+        }}
       >获取源码</Button>
-      <div style={{marginTop: '30px'}}>
-        <strong>欢迎: 提问, PR, Watch, Star, Fork</strong>
+      <div style={{marginTop: '25px', color: '#fa541c'}}>
+        <strong>欢迎: 提问, PR, Watch, Star, Fork, 捐助</strong>
+      </div>
+      <div className={'pay-image-panel'}>
+        <img src={'/wx-pay.png'}/>
+        <img src={'/ali-pay.png'}/>
       </div>
     </div>
   );
