@@ -2,7 +2,7 @@ import React, {Component} from 'react'
 import {connect} from 'dva';
 
 import router from 'umi/router'
-import {Tabs, Input, Row, Col} from 'antd'
+import {Tabs, Input, Row, Col, message} from 'antd'
 
 import SwaggerSearch from '@/pages/top/SwaggerSearch'
 import ApiList from '@/pages/right/ApiList'
@@ -49,7 +49,18 @@ class BasicLayout extends Component {
   }
 
   onTabChange = (activeKey) => {
-    this.setState({activeKey})
+    const {GlobalModel} = this.props
+    const {swaggerDoc, apiDetail} = GlobalModel
+    console.log(GlobalModel, swaggerDoc)
+    if (swaggerDoc) {
+      if (activeKey === 'ApiTest' && !apiDetail) {
+        message.info('请先选择一个API!')
+      } else {
+        this.setState({activeKey})
+      }
+    } else {
+      message.info('请先输入swagger文档地址,获取文档!')
+    }
   }
 
   onSearchSwaggerDoc = ({swaggerUri, httpType}) => {
