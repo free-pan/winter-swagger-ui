@@ -301,7 +301,6 @@ class ApiTestForm extends PureComponent {
           } else {
             // 普通get提交
             const tmpObj = this.removeEmptyValueField(__form)
-            console.log('tmpObj',tmpObj)
             apiRemoteService.normalGet(realApiTestUrl, tmpObj, headers).then(function (result) {
               that.printResponse(realApiTestUrl, result)
             });
@@ -351,7 +350,6 @@ class ApiTestForm extends PureComponent {
   render() {
     console.log('ApiTestForm')
     const {testApiFullUrl, apiDetail, swaggerDocBasicInfo, form} = this.props
-    console.log('apiDetail',apiDetail)
     return (
       <div className={styles.container}>
         <Form onSubmit={this.onSubmitForm}>

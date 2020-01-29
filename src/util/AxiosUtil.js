@@ -1,4 +1,4 @@
-import request, {extend} from 'umi-request';
+import request, { extend } from 'umi-request';
 
 /**
  * 默认超时时间10秒
@@ -7,18 +7,25 @@ import request, {extend} from 'umi-request';
 const defaultTimeout = 10;
 
 const errorHandler = function (error) {
-  const codeMap = {
-    '021': '发生错误啦',
-    '022': '发生大大大大错误啦',
-  };
+  const { response = {}, message = '', data = {} } = error;
+  console.log('error response', response)
+  console.log('error message', message)
+  console.log('error data', data)
   if (error.response) {
     // 请求已发送但服务端返回状态码非 2xx 的响应
     console.log(error.response.status);
     console.log(error.response.headers);
     console.log(error.data);
     console.log(error.request);
-    console.log(codeMap[error.data.status])
-    return {response: error.data}
+    let dataStr = ''
+    if (error.data) {
+      if (typeof(error.data) === 'object') {
+        dataStr = JSON.stringify(data);
+      } else {
+        dataStr = error.data
+      }
+    }
+    return { response: { status: error.response.status, error: dataStr ? dataStr : error.statusText } }
   } else {
     // 请求初始化时出错或者没有响应返回的异常
     console.log(error.message);
@@ -30,7 +37,12 @@ const errorHandler = function (error) {
   return;
 }
 
-const extendRequest = extend({timeout: defaultTimeout * 1000, errorHandler, getResponse: true, credentials: 'include'})
+const extendRequest = extend({
+  timeout: defaultTimeout * 1000,
+  errorHandler,
+  getResponse: true,
+  credentials: 'include'
+})
 export default {
   /**
    * 普通的form表单提交方式
@@ -42,8 +54,15 @@ export default {
    * @param getResponse {boolean} 是否包含响应头信息. 默认:false
    * @returns {Promise<any>}
    */
-  formPost(url, data = {}, {useCache = false, timeout = defaultTimeout, headers = {}, getResponse = false} = {}) {
-    return extendRequest.post(url, {data, headers, timeout: timeout * 1000, useCache, requestType: 'form', getResponse})
+  formPost(url, data = {}, { useCache = false, timeout = defaultTimeout, headers = {}, getResponse = false } = {}) {
+    return extendRequest.post(url, {
+      data,
+      headers,
+      timeout: timeout * 1000,
+      useCache,
+      requestType: 'form',
+      getResponse
+    })
   },
 
   /**
@@ -55,8 +74,15 @@ export default {
    * @param headers 其它额外的请求头
    * @param getResponse {boolean} 是否包含响应头信息. 默认:false
    */
-  bodyPost(url, data = {}, {useCache = false, timeout = defaultTimeout, headers = {}, getResponse = false} = {}) {
-    return extendRequest.post(url, {data, headers, timeout: timeout * 1000, useCache, requestType: 'json', getResponse})
+  bodyPost(url, data = {}, { useCache = false, timeout = defaultTimeout, headers = {}, getResponse = false } = {}) {
+    return extendRequest.post(url, {
+      data,
+      headers,
+      timeout: timeout * 1000,
+      useCache,
+      requestType: 'json',
+      getResponse
+    })
   },
 
   /**
@@ -69,7 +95,7 @@ export default {
    * @param getResponse {boolean} 是否包含响应头信息. 默认:true
    * @return 结果中默认含响应头, 获取响应头方式: request('/api/v1/some/api', { getResponse: true })..then(({ data, response}) => { response.headers.get('Content-Type'); })
    */
-  bodyPostDownload(url, data = {}, {useCache = false, timeout = defaultTimeout, headers = {}, getResponse = true} = {}) {
+  bodyPostDownload(url, data = {}, { useCache = false, timeout = defaultTimeout, headers = {}, getResponse = true } = {}) {
     return extendRequest.post(url, {
       data,
       getResponse,
@@ -90,7 +116,7 @@ export default {
    * @param getResponse {boolean} 是否包含响应头信息. 默认:false
    * @returns {Promise<any>}
    */
-  formPatch(url, data = {}, {useCache = false, timeout = defaultTimeout, headers = {}, getResponse = false} = {}) {
+  formPatch(url, data = {}, { useCache = false, timeout = defaultTimeout, headers = {}, getResponse = false } = {}) {
     return extendRequest.patch(url, {
       data,
       headers,
@@ -110,7 +136,7 @@ export default {
    * @param headers 其它额外的请求头
    * @param getResponse {boolean} 是否包含响应头信息. 默认:false
    */
-  bodyPatch(url, data = {}, {useCache = false, timeout = defaultTimeout, headers = {}, getResponse = false} = {}) {
+  bodyPatch(url, data = {}, { useCache = false, timeout = defaultTimeout, headers = {}, getResponse = false } = {}) {
     return extendRequest.patch(url, {
       data,
       headers,
@@ -131,7 +157,7 @@ export default {
    * @param getResponse {boolean} 是否包含响应头信息. 默认:false
    * @return 结果中默认不包含响应头,如果需要包含响应头,请设置 getResponse 为 true
    */
-  bodyPut(url, data = {}, {useCache = false, timeout = defaultTimeout, headers = {}, getResponse = false} = {}) {
+  bodyPut(url, data = {}, { useCache = false, timeout = defaultTimeout, headers = {}, getResponse = false } = {}) {
     return extendRequest.put(url, {
       data,
       getResponse,
@@ -150,7 +176,7 @@ export default {
    * @param getResponse {boolean} 是否包含响应头信息. 默认:false
    * @return 结果中默认不包含响应头,如果需要包含响应头,请设置 getResponse 为 true
    */
-  formPut(url, data = {}, {useCache = false, timeout = defaultTimeout, headers = {}, getResponse = false} = {}) {
+  formPut(url, data = {}, { useCache = false, timeout = defaultTimeout, headers = {}, getResponse = false } = {}) {
     return extendRequest.put(url, {
       requestType: 'form',
       data,
@@ -169,7 +195,7 @@ export default {
    * @param getResponse {boolean} 是否包含响应头信息. 默认:false
    * @return 结果中默认不包含响应头,如果需要包含响应头,请设置 getResponse 为 true
    */
-  delete(url, data = {}, {useCache = false, timeout = defaultTimeout, headers = {}, getResponse = false} = {}) {
+  delete(url, data = {}, { useCache = false, timeout = defaultTimeout, headers = {}, getResponse = false } = {}) {
     return extendRequest.delete(url, {
       useCache,
       getResponse,
@@ -188,7 +214,7 @@ export default {
    * @param getResponse {boolean} 是否包含响应头信息. 默认:false
    * @return 结果中默认不包含响应头,如果需要包含响应头,请设置 getResponse 为 true
    */
-  get(url, data = {}, {useCache = false, timeout = defaultTimeout, headers = {}, getResponse = false} = {}) {
+  get(url, data = {}, { useCache = false, timeout = defaultTimeout, headers = {}, getResponse = false } = {}) {
     return extendRequest.get(url, {
       useCache,
       getResponse,
@@ -207,7 +233,7 @@ export default {
    * @param getResponse {boolean} 是否包含响应头信息. 默认:false
    * @return 结果中默认不包含响应头,如果需要包含响应头,请设置 getResponse 为 true
    */
-  upload(url, formData, {timeout = defaultTimeout, headers = {}, getResponse = false} = {}) {
+  upload(url, formData, { timeout = defaultTimeout, headers = {}, getResponse = false } = {}) {
     return extendRequest(url, {
       method: 'post',
       getResponse,
