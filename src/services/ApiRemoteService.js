@@ -1,4 +1,4 @@
-import ApiUtil from '@/util/AxiosUtil.js';
+import ApiUtil from '@/util/AjaxUtil.js';
 
 
 export default {

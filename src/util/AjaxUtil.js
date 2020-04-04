@@ -1,4 +1,5 @@
 import request, { extend } from 'umi-request';
+import qs from "qs";
 
 /**
  * 默认超时时间10秒
@@ -41,7 +42,10 @@ const extendRequest = extend({
   timeout: defaultTimeout * 1000,
   errorHandler,
   getResponse: true,
-  credentials: 'include'
+  credentials: 'include',
+  paramsSerializer: function (params) {
+    return qs.stringify(params, { indices: true, allowDots: true });
+  },
 })
 export default {
   /**
@@ -217,8 +221,8 @@ export default {
   get(url, data = {}, { useCache = false, timeout = defaultTimeout, headers = {}, getResponse = false } = {}) {
     return extendRequest.get(url, {
       useCache,
+      params:data,
       getResponse,
-      params: data,
       timeout: timeout * 1000,
       headers
     })
