@@ -125,10 +125,10 @@ class ApiDetailExtract {
    */
   extractExampleVal(singleParamDefine) {
     let exampleVal = ''
-    if (typeof (singleParamDefine.example) !== 'undefined') {
+    if (singleParamDefine.example) {
       exampleVal = singleParamDefine.example
     }
-    if (typeof (singleParamDefine.example) !== 'undefined') {
+    if (!exampleVal && singleParamDefine['x-example']) {
       exampleVal = singleParamDefine['x-example']
     }
     return exampleVal
