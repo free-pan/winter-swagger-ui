@@ -16,7 +16,7 @@ class AboutAuthor extends Component {
     const author = {name: '潘志勇', wx: 'coder_pan', desc: '一个会一点前端技术的专业JAVA后端 (- . -)!'}
     const swaggerUI = {
       version: '2.0',
-      sourceRepo: 'https://gitee.com/free_pan/swagger-ui-theme',
+      sourceRepo: 'https://gitee.com/free_pan/winter-swagger-ui',
       desc: '基于UMI框架开发, 欢迎start, 克隆, 推荐使用!'
     }
     return (
@@ -32,7 +32,7 @@ class AboutAuthor extends Component {
         <Row>
           <Col span={12}><strong>版本:</strong><span>{swaggerUI.version}</span></Col>
           <Col span={12}><strong>源码:</strong><span><a
-            href={swaggerUI.sourceRepo}>Swagger UI theme</a></span></Col>
+            href={swaggerUI.sourceRepo}>winter-swagger-ui</a></span></Col>
         </Row>
         <div><strong>其它:</strong><span>{swaggerUI.desc}</span></div>
         <Divider orientation="left" dashed={true}>发现</Divider>
