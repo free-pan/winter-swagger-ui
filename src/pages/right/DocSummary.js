@@ -16,11 +16,11 @@ class DocSummary extends Component {
   render() {
     console.log('DocSummary')
     const {swaggerDocBasicInfo} = this.props
+    console.log('swaggerDocBasicInfo',swaggerDocBasicInfo)
     if (swaggerDocBasicInfo) {
       const {info, swagger, host, basePath} = swaggerDocBasicInfo
-      const {title, version, contact, description} = info
+      const {title, version, contact={}, description} = info
       const {name, email} = contact
-      console.log('swaggerDocBasicInfo', swaggerDocBasicInfo)
       return (
         <div>
           <h3 style={{textAlign: 'center', fontWeight: "bold"}}>{title}</h3>

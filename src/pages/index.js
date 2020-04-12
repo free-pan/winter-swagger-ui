@@ -11,7 +11,7 @@ const Index = (props) => {
       </h3>
       <Button
         onClick={()=>{
-          window.open('https://gitee.com/free_pan/swagger-ui-theme')
+          window.open('https://gitee.com/free_pan/winter-swagger-ui')
         }}
         type={'primary'} size={'large'}
         className={'load-source-btn'}
