@@ -12,6 +12,12 @@
 
 ![文档概况页.png](./文档概况页.png)
 
+## 前提
+
+全局安装`umi 2.x`
+
+`tyarn global add umi@2.13.3`
+
 ## 运行
 
 ```shell
