@@ -9,8 +9,8 @@
   },
   "browser_action": {
     "default_icon": {
-      "19": "logo192.png",
-      "38": "logo192.png"
+      "19": "chrome-icon.png",
+      "38": "chrome-icon.png"
     },
     "default_title": "winter-swagger-ui",
     "default_popup": "popup.html"
@@ -18,9 +18,7 @@
   "permissions": [
     "http://*/*",
     "https://*/*",
-    "alarms",
     "tabs",
-    "notifications",
     "storage",
     "webRequest",
     "webRequestBlocking"
