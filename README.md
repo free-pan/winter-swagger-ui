@@ -37,3 +37,8 @@ tyarn run build
 ## 关于 chrome 浏览器插件
 
 由于 `chrome` 浏览器的跨域限制越来越严格, 以及服务端可能并未开启跨域访问支持, 因此加入了 chrome 浏览器插件功能, 使其能够绕过跨域限制
+
+## chrome浏览器如何引入 winter-swagger-ui 插件?
+
+1. 执行打包`tyarn run build`, 此时会打包到dist目录
+2. chrome打开插件管理界面, 启用开发者模式, 加入已解压的插件目录, 即第一步的dist目录
