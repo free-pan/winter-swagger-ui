@@ -176,6 +176,26 @@ class ApiTestForm extends PureComponent {
     return globalHeader
   }
 
+  responseIsImageResult = (apiDetail)=>{
+    const {produces} = apiDetail
+    let isImageResult = false;
+    if (produces) {
+      for (const single of produces) {
+        if (single.indexOf('xml') >= 0) {
+          break;
+        } else if (this.isBinaryResult(single)) {
+          break;
+        } else if (-1 !== single.indexOf('image/jpeg')
+          || -1 !== single.indexOf('image/png')
+          || -1 !== single.indexOf('image/gif')) {
+          isImageResult = true;
+          break;
+        }
+      }
+    }
+    return isImageResult
+  }
+
   onSubmitForm = (e) => {
     e.preventDefault()
     this.setState({
@@ -247,6 +267,7 @@ class ApiTestForm extends PureComponent {
 
         const realApiTestUrl = __path ? WinterUtil.formReplacePathVar(testApiFullUrl, __path) : testApiFullUrl;
         const that = this
+
         if (upperMethod === 'POST') {
           if (isUpload) {
             const {fileList} = this.state
@@ -292,7 +313,8 @@ class ApiTestForm extends PureComponent {
             }
             let img = document.createElement('img');
             const tmpObj = this.removeEmptyValueField(__form)
-            img.src = WinterUtil.convertRealUrl(realApiTestUrl, tmpObj);
+            img.src = WinterUtil.convertRealUrl(realApiTestUrl, {...tmpObj,__timezone_clear_cache__:new Date().getTime()});
+            console.log(img.src)
             img.setAttribute('id', 'image-content-image');
             document.getElementById('image-content').append(img);
             this.setState({
@@ -383,7 +405,7 @@ class ApiTestForm extends PureComponent {
           </Button>
         </Form>
 
-        <ApiTestResponse onMounted={this.onApiTestResponseMounted}/>
+        <ApiTestResponse onMounted={this.onApiTestResponseMounted} isImageResult={this.responseIsImageResult(apiDetail)}/>
       </div>
     );
   }

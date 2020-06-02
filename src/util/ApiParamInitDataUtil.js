@@ -4,6 +4,7 @@
  * @return {*}
  */
 export function buildInitialValue(singleParam) {
+  console.log('buildInitialValue',singleParam)
   return singleParam.default ? singleParam.default : singleParam.example ? singleParam.example : ''
 }
 

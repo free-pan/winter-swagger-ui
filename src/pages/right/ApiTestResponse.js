@@ -1,10 +1,10 @@
-import React, {Component} from 'react';
+import React, { Component } from 'react';
 import PropTypes from 'prop-types';
 
 import styles from './ApiTest.less'
 import WinterCodemirror from '@/components/WinterCodemirror'
 import DrawerCodemirror from "@/pages/right/DrawerCodemirror";
-import {Drawer} from "antd";
+import { Drawer } from "antd";
 
 class ApiTestResponse extends Component {
 
@@ -57,13 +57,13 @@ class ApiTestResponse extends Component {
 
   onShowDrawer = () => {
     console.log('onShowDrawer')
-    this.setState({drawerVisible: true});
+    this.setState({ drawerVisible: true });
     this.drawerCodemirrorInstance.setValue(this.getWinterCodeMirrorValue())
   }
 
   onDrawerClose = (e) => {
     e.preventDefault()
-    this.setState({drawerVisible: false});
+    this.setState({ drawerVisible: false });
   }
 
   onDrawerCodemirrorMounted = (editorInstance) => {
@@ -71,40 +71,42 @@ class ApiTestResponse extends Component {
   }
 
   render() {
-    const {drawerVisible} = this.state
+    const { drawerVisible } = this.state
+    const { isImageResult } = this.props;
     return (
       <div>
-        <h3 className={styles.header}>
+        <h3 className={ styles.header }>
           响应结果
-          <a style={{fontSize: '13px', marginLeft: '5px'}}
-             onClick={this.onShowDrawer}
-          >独立窗查看</a>
+          {isImageResult?'':<a style={ { fontSize: '13px', marginLeft: '5px' } }
+                               onClick={ this.onShowDrawer }
+          >独立窗查看</a>}
         </h3>
-        <div className={styles.editorBorder}>
+        { isImageResult ? <div id={ 'image-content' }></div> : <div className={ styles.editorBorder }>
           <WinterCodemirror
-            idPrefix={'resp_small_'}
-            size={{height: 256}}
-            cmOption={{
+            idPrefix={ 'resp_small_' }
+            size={ { height: 256 } }
+            cmOption={ {
               mode: 'javascript',
               readOnly: true
-            }}
-            onMounted={this.onWinterCodeMirrorMounted}
+            } }
+            onMounted={ this.onWinterCodeMirrorMounted }
           />
-        </div>
+        </div> }
+
 
         <Drawer
           placement="right"
-          closable={true}
-          onClose={this.onDrawerClose}
-          visible={drawerVisible}
-          getContainer={false}
-          width={550}
-          className={styles.codemirrorDrawer}
-          style={{position: 'absolute'}}
+          closable={ true }
+          onClose={ this.onDrawerClose }
+          visible={ drawerVisible }
+          getContainer={ false }
+          width={ 550 }
+          className={ styles.codemirrorDrawer }
+          style={ { position: 'absolute' } }
         >
-          <DrawerCodemirror title={'查看请求体参数'}
-                            onMounted={this.onDrawerCodemirrorMounted}
-                            visible={drawerVisible} readOnly={true}/>
+          <DrawerCodemirror title={ '查看请求体参数' }
+                            onMounted={ this.onDrawerCodemirrorMounted }
+                            visible={ drawerVisible } readOnly={ true }/>
         </Drawer>
       </div>
     );
@@ -112,7 +114,14 @@ class ApiTestResponse extends Component {
 }
 
 ApiTestResponse.propTypes = {
-  onMounted: PropTypes.func.isRequired
+  /**
+   * 挂载完毕执行的回调函数
+   */
+  onMounted: PropTypes.func.isRequired,
+  /**
+   * 请求的返回结果是否为图片
+   */
+  isImageResult: PropTypes.bool.isRequired
 };
 
 export default ApiTestResponse;
