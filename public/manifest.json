@@ -4,8 +4,8 @@
   "name": "winter-swagger-ui",
   "description": "winter-swagger-ui chrome plugin",
   "icons": {
-    "16": "logo192.png",
-    "128": "logo192.png"
+    "16": "chrome-icon.png",
+    "128": "chrome-icon.png"
   },
   "browser_action": {
     "default_icon": {
