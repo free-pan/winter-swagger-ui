@@ -13,7 +13,7 @@ export default {
   },
 
   async normalGet(url, params, headerParams) {
-    return ApiUtil.get(url, params, { headers: headerParams, getResponse: true });
+    return ApiUtil.get(url, params, { headers: { ...headerParams, Accept: '*/*' }, getResponse: true });
   },
   async normalDelete(url, params, headerParams) {
     return ApiUtil.delete(url, params, { headers: headerParams, getResponse: true });
@@ -21,11 +21,11 @@ export default {
   async normalBodyPost(url, params, headerParams) {
     return ApiUtil.bodyPost(url, params, { headers: headerParams, getResponse: true });
   },
-  async specialBodyPost(url, params, formParams,headerParams) {
-    if(formParams){
+  async specialBodyPost(url, params, formParams, headerParams) {
+    if (formParams) {
       let newUrl = url + '?' + qs.stringify(formParams, { indices: true, allowDots: true })
       return ApiUtil.bodyPost(newUrl, params, { headers: headerParams, getResponse: true });
-    }else{
+    } else {
       return ApiUtil.bodyPost(url, params, { headers: headerParams, getResponse: true });
     }
   },

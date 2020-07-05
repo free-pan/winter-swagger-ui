@@ -127,17 +127,32 @@ class ApiTestForm extends PureComponent {
       const { data, response } = result
       if (response.status === 200 || response.status === 201) {
         antdMessage.info(testApiUrl + '   ===>  http响应状态码: ' + response.status);
-        let isBinaryResult = this.isBinaryResult(response.headers['content-type']);
+        let isBinaryResult = this.isBinaryResult(response.headers.get('content-type'));
+        if(!isBinaryResult){
+          isBinaryResult = this.isBinaryResult(response.headers.get('Content-Type'))
+        }
+        if(!isBinaryResult){
+          isBinaryResult = this.isBinaryResult(response.headers.get('CONTENT-TYPE'))
+        }
+        console.log('isBinaryResult',isBinaryResult,response,response.headers['content-type'],response.headers['Content-Type'],response.headers['CONTENT-TYPE'])
         if (isBinaryResult) {
           let url = window.URL.createObjectURL(new Blob([data]));
           let link = document.createElement('a');
           link.href = url;
-          let fileName = '后台返回的下载文件(未在content-disposition中找到文件名)';
-          if (response.headers['content-disposition']) {
-            let tmp = response.headers['content-disposition'].replace(new RegExp("attachment;filename=", 'gm'), "");
+          let fileName = response.headers.get('content-disposition');
+          if(!fileName){
+            fileName = response.headers.get('Content-Disposition');
+          }
+          if(!fileName){
+            fileName = response.headers.get('CONTENT-DISPOSITION');
+          }
+          if (fileName) {
+            let tmp = fileName.replace(new RegExp("attachment;filename=", 'gm'), "");
             if ('' !== tmp) {
               fileName = decodeURI(tmp);
             }
+          }else{
+            fileName = decodeURI('后台返回的下载文件(未在content-disposition中找到文件名)');
           }
           link.setAttribute('download', fileName);
           link.setAttribute('id', 'real-download-file');
@@ -198,6 +213,26 @@ class ApiTestForm extends PureComponent {
       }
     }
     return isImageResult
+  }
+
+  responseIsBinaryResult = (apiDetail) => {
+    const { produces } = apiDetail
+    let isBinaryResult = false;
+    if (produces) {
+      for (const single of produces) {
+        if (single.indexOf('xml') >= 0) {
+          break;
+        } else if (this.isBinaryResult(single)) {
+          isBinaryResult = true;
+          break;
+        } else if (-1 !== single.indexOf('image/jpeg')
+          || -1 !== single.indexOf('image/png')
+          || -1 !== single.indexOf('image/gif')) {
+          break;
+        }
+      }
+    }
+    return isBinaryResult
   }
 
   onSubmitForm = (values) => {
@@ -433,7 +468,7 @@ class ApiTestForm extends PureComponent {
         </Form>
 
         <ApiTestResponse onMounted={ this.onApiTestResponseMounted }
-                         isImageResult={ this.responseIsImageResult(apiDetail) }/>
+                         isImageResult={ this.responseIsImageResult(apiDetail) } isBinaryResult={this.responseIsBinaryResult(apiDetail)}/>
       </div>
     );
   }

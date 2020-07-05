@@ -93,32 +93,39 @@ class WinterCodemirror extends Component {
     if (this.showLog) {
       console.log('WinterCodemirror componentDidMount')
     }
-    const {
-      // codemirror本身支持的选项
-      cmOption = {},
-      // codemirror组件的宽高, 默认宽度100%, 高度500px
-      size = {width: '100%', height: 500},
-      // 默认值
-      defaultValue,
-      // Codemirror初始化并挂载到dom节点中之后触发
-      onMounted
-    } = this.props
+    this.codeMirrorInit()
+  }
 
-    const realCmOption = this.buildRealCodemirrorOption(cmOption)
+  codeMirrorInit(){
+    if(!this.editor){
+      console.log('codeMirrorInit------->')
+      const {
+        // codemirror本身支持的选项
+        cmOption = {},
+        // codemirror组件的宽高, 默认宽度100%, 高度500px
+        size = {width: '100%', height: 500},
+        // 默认值
+        defaultValue,
+        // Codemirror初始化并挂载到dom节点中之后触发
+        onMounted
+      } = this.props
 
-    const textareaDom = document.getElementById(this.buildRealId())
-    const editor = CodeMirror.fromTextArea(textareaDom, realCmOption)
-    this.editor = editor
+      const realCmOption = this.buildRealCodemirrorOption(cmOption)
 
-    const {width, height} = size
-    // 设置宽高
-    editor.setSize(width, height)
-    const value = this.strNotBlank(defaultValue) ? defaultValue : BLANK_STR
-    editor.setValue(value)
+      const textareaDom = document.getElementById(this.buildRealId())
+      const editor = CodeMirror.fromTextArea(textareaDom, realCmOption)
+      this.editor = editor
 
-    editor.on("change", this.onCodeMirrorContentChangeThrottled);
-    if (onMounted) {
-      onMounted(this)
+      const {width, height} = size
+      // 设置宽高
+      editor.setSize(width, height)
+      const value = this.strNotBlank(defaultValue) ? defaultValue : BLANK_STR
+      editor.setValue(value)
+
+      editor.on("change", this.onCodeMirrorContentChangeThrottled);
+      if (onMounted) {
+        onMounted(this)
+      }
     }
   }
 
@@ -129,11 +136,22 @@ class WinterCodemirror extends Component {
     return nextState.codeContent !== this.state.codeContent
   }
 
+  componentDidUpdate(prevProps, prevState, snapshot) {
+    if(!this.editor){
+      console.log('------> componentDidUpdate')
+      this.codeMirrorInit()
+    }
+  }
+
   componentWillUnmount() {
     // 此段代码的意义是避免这个段警告: Can't perform a React state update on an unmounted component. This is a no-op, but it indicates a memory leak in your application. To fix, cancel all subscriptions and asynchronous tasks in the componentWillUnmount method
     this.setState = (state, callback) => {
       return;
     };
+    console.log('--------> componentWillUnmount',this.editor,this.editor.getWrapperElement())
+    this.editor.toTextArea()
+    this.editor.getWrapperElement().remove()
+    this.editor = null;
     // this.editor.off('change', this.onCodeMirrorContentChangeThrottled)
     // this.editor.toTextArea()
     // this.editor = null
@@ -161,8 +179,6 @@ class WinterCodemirror extends Component {
     if (this.editor) {
       const realValue = this.strNotBlank(value) ? value : BLANK_STR
       this.editor.setValue(realValue)
-    } else {
-      throw "CodeMirror尚未实例化!"
     }
   }
 
@@ -175,7 +191,7 @@ class WinterCodemirror extends Component {
     if (this.editor) {
       this.editor.setOption(option, value)
     } else {
-      throw "CodeMirror尚未实例化!"
+      // throw "CodeMirror尚未实例化!"
     }
   }
 
@@ -188,7 +204,7 @@ class WinterCodemirror extends Component {
     if (this.editor) {
       return this.editor.getOption()
     } else {
-      throw "CodeMirror尚未实例化!"
+      // throw "CodeMirror尚未实例化!"
     }
   }
 
@@ -201,7 +217,7 @@ class WinterCodemirror extends Component {
     if (this.editor) {
       this.editor.setSize(width, height)
     } else {
-      throw "CodeMirror尚未实例化!"
+      // throw "CodeMirror尚未实例化!"
     }
   }
 
@@ -213,7 +229,7 @@ class WinterCodemirror extends Component {
     if (this.editor) {
       return this.editor.getValue()
     } else {
-      throw "CodeMirror尚未实例化!"
+      // throw "CodeMirror尚未实例化!"
     }
   }
 

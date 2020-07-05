@@ -1,4 +1,4 @@
-import React, { Component } from 'react';
+import React, { Component, PureComponent } from 'react';
 import PropTypes from 'prop-types';
 
 import styles from './ApiTest.less'
@@ -6,7 +6,7 @@ import WinterCodemirror from '@/components/WinterCodemirror'
 import DrawerCodemirror from "@/pages/right/DrawerCodemirror";
 import { Drawer } from "antd";
 
-class ApiTestResponse extends Component {
+class ApiTestResponse extends PureComponent {
 
   state = {
     renderTimes: 0,
@@ -20,16 +20,70 @@ class ApiTestResponse extends Component {
     super(props);
   }
 
-  shouldComponentUpdate(nextProps, nextState) {
-    return nextState.renderTimes !== this.state.renderTimes || nextState.drawerVisible !== this.state.drawerVisible
-  }
-
   componentDidMount() {
     if (this.props.onMounted) {
       this.props.onMounted(this)
     }
   }
 
+  componentDidUpdate(prevProps, prevState, snapshot) {
+    console.log('ApiTest Response:componentDidUpdate<<--------------------')
+    const { isImageResult } = this.props;
+    const { isBinaryResult } = this.props;
+    console.log(isImageResult,isBinaryResult)
+    let dom;
+    if(isImageResult){
+      dom = document.getElementById('download-file')
+      if(dom){
+        dom.remove()
+      }
+      dom = document.getElementById('real-download-file')
+      if(dom){
+        dom.remove()
+      }
+    }
+    if(isBinaryResult){
+      dom = document.getElementById('image-content')
+      if(dom){
+        dom.remove()
+      }
+      dom = document.getElementById('image-content-image')
+      if(dom){
+        dom.remove()
+      }
+    }
+    if(!isImageResult && !isBinaryResult){
+      dom = document.getElementById('download-file')
+      console.log(dom)
+      if(dom){
+        dom.remove()
+      }
+      dom = document.getElementById('image-content')
+      console.log(dom)
+      if(dom){
+        dom.remove()
+      }
+      dom = document.getElementById('image-content-image')
+      if(dom){
+        dom.remove()
+      }
+      dom = document.getElementById('real-download-file')
+      if(dom){
+        dom.remove()
+      }
+    }
+  }
+
+  componentWillUnmount() {
+    let dom = document.getElementById('image-content')
+    if(dom){
+      dom.remove()
+    }
+    dom = document.getElementById('download-file')
+    if(dom){
+      dom.remove()
+    }
+  }
 
   /**
    * 当WinterCodemirror挂载完毕之后触发的回调函数
@@ -70,18 +124,19 @@ class ApiTestResponse extends Component {
     this.drawerCodemirrorInstance = editorInstance
   }
 
-  render() {
-    const { drawerVisible } = this.state
-    const { isImageResult } = this.props;
-    return (
-      <div>
-        <h3 className={ styles.header }>
-          响应结果
-          {isImageResult?'':<a style={ { fontSize: '13px', marginLeft: '5px' } }
-                               onClick={ this.onShowDrawer }
-          >独立窗查看</a>}
-        </h3>
-        { isImageResult ? <div id={ 'image-content' }></div> : <div className={ styles.editorBorder }>
+  renderRealResult(isImageResult, isBinaryResult) {
+    console.log(isImageResult, isBinaryResult)
+    if (isImageResult) {
+      return (
+        <div id={ 'image-content' }></div>
+      )
+    } else if (isBinaryResult) {
+      return (
+        <div id={ 'download-file' }></div>
+      )
+    } else {
+      return (
+        <div className={ styles.editorBorder }>
           <WinterCodemirror
             idPrefix={ 'resp_small_' }
             size={ { height: 256 } }
@@ -91,7 +146,25 @@ class ApiTestResponse extends Component {
             } }
             onMounted={ this.onWinterCodeMirrorMounted }
           />
-        </div> }
+        </div>
+      )
+    }
+  }
+
+  render() {
+    const { drawerVisible } = this.state
+    const { isImageResult } = this.props;
+    const { isBinaryResult } = this.props;
+    console.log('ApiTestResponse.js render')
+    return (
+      <div>
+        <h3 className={ styles.header }>
+          响应结果
+          { (isImageResult || isBinaryResult) ? '' : <a style={ { fontSize: '13px', marginLeft: '5px' } }
+                                                        onClick={ this.onShowDrawer }
+          >独立窗查看</a> }
+        </h3>
+        { this.renderRealResult(isImageResult, isBinaryResult) }
 
 
         <Drawer
@@ -121,7 +194,11 @@ ApiTestResponse.propTypes = {
   /**
    * 请求的返回结果是否为图片
    */
-  isImageResult: PropTypes.bool.isRequired
+  isImageResult: PropTypes.bool.isRequired,
+  /**
+   * 请求的返回结果是否为二进制数据(文件)
+   */
+  isBinaryResult: PropTypes.bool.isRequired
 };
 
 export default ApiTestResponse;
