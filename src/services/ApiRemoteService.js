@@ -21,6 +21,14 @@ export default {
   async normalBodyPost(url, params, headerParams) {
     return ApiUtil.bodyPost(url, params, { headers: headerParams, getResponse: true });
   },
+  async specialBodyPost(url, params, formParams,headerParams) {
+    if(formParams){
+      let newUrl = url + '?' + qs.stringify(formParams, { indices: true, allowDots: true })
+      return ApiUtil.bodyPost(newUrl, params, { headers: headerParams, getResponse: true });
+    }else{
+      return ApiUtil.bodyPost(url, params, { headers: headerParams, getResponse: true });
+    }
+  },
   /**
    * post方式实现文件下载
    * @param url

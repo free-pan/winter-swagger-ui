@@ -246,10 +246,10 @@ class ApiTestForm extends PureComponent {
     }
 
     let isNormalPostForm = false;
-    if(consumes){
+    if (consumes) {
       for (const single of consumes) {
-        if('application/x-www-form-urlencoded'===single){
-          isNormalPostForm=true;
+        if ('application/x-www-form-urlencoded' === single) {
+          isNormalPostForm = true;
           break;
         }
       }
@@ -305,19 +305,25 @@ class ApiTestForm extends PureComponent {
           });
         } else {
           // post使用request body传参
-          apiRemoteService.normalBodyPost(realApiTestUrl, __bodyForm, headers).then(function (result) {
-            that.printResponse(realApiTestUrl, result)
-          });
+          if (__form) {
+            apiRemoteService.specialBodyPost(realApiTestUrl, __bodyForm, __form, headers).then(function (result) {
+              that.printResponse(realApiTestUrl, result)
+            });
+          } else {
+            apiRemoteService.normalBodyPost(realApiTestUrl, __bodyForm, headers).then(function (result) {
+              that.printResponse(realApiTestUrl, result)
+            });
+          }
         }
       } else {
         const tmpObj = this.removeEmptyValueField(__form)
-        if(isNormalPostForm){
+        if (isNormalPostForm) {
           // post使用普通的表单传参
-          console.log('upperMethod',upperMethod,__form)
+          console.log('upperMethod', upperMethod, __form)
           apiRemoteService.normalFormPost(realApiTestUrl, tmpObj, headers).then(function (result) {
             that.printResponse(realApiTestUrl, result)
           });
-        }else{
+        } else {
           apiRemoteService.specialFormPost(realApiTestUrl, tmpObj, headers).then(function (result) {
             that.printResponse(realApiTestUrl, result)
           });
@@ -392,10 +398,10 @@ class ApiTestForm extends PureComponent {
   render() {
     console.log('ApiTestForm')
     const { testApiFullUrl, apiDetail, swaggerDocBasicInfo, form } = this.props
-    console.log('apiDetail',apiDetail)
+    console.log('apiDetail', apiDetail)
     return (
       <div className={ styles.container }>
-        <Form ref={this.formRef} onFinish={ this.onSubmitForm }>
+        <Form ref={ this.formRef } onFinish={ this.onSubmitForm }>
           <ApiTestFormParamPart
             paramNamePrefix={ '__path' }
             title={ '路径参数' }
