@@ -1,7 +1,7 @@
 import React, {Component} from 'react'
 import {connect} from 'dva';
 
-import router from 'umi/router'
+import { history } from 'umi';
 import {Tabs, Input, Row, Col, message} from 'antd'
 
 import SwaggerSearch from '@/pages/top/SwaggerSearch'
@@ -74,7 +74,8 @@ class BasicLayout extends Component {
       {httpType: httpType, swaggerUri: swaggerUri, pathname: '/index'}
     )
     if (!urlIsSame) {
-      router.push({
+
+      history.push({
         pathname: '/index',
         query: {
           ...query,
@@ -97,7 +98,7 @@ class BasicLayout extends Component {
       {...query, pathname: pathname, kw: value}
     )
     if (!urlIsSame) {
-      router.push({
+      history.push({
         pathname: pathname,
         query: {
           ...query,
@@ -121,7 +122,7 @@ class BasicLayout extends Component {
       {...query, pathname: '/detail', apiKey: key}
     )
     if (!urlIsSame) {
-      router.push({
+      history.push({
         pathname: '/detail',
         query: {
           ...query,
@@ -232,7 +233,7 @@ class BasicLayout extends Component {
                   <ApiTest {...propsApiTest}/>
                 </TabPane>
                 <TabPane tab="全局请求头" key="GlobalHeader">
-                  <GlobalHeader {...propsGlobalHeader}/>
+                  {/*<GlobalHeader {...propsGlobalHeader}/>*/}
                 </TabPane>
                 <TabPane tab="文档概况" key="DocSummary">
                   <DocSummary {...propsDocSummary} />

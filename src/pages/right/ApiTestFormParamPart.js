@@ -32,7 +32,6 @@ function buildAddonBefore(paramName, required) {
  */
 const ApiTestFormParamPart = (props) => {
   const { paramList, form, paramNamePrefix, title } = props
-  const { getFieldDecorator } = form;
   if (paramList && paramList.length > 0) {
     const formItemArr = [];
     let key = 0;
@@ -43,13 +42,13 @@ const ApiTestFormParamPart = (props) => {
       const placeholder = singleParam.description;
       const addonBefore = buildAddonBefore(paramName, required);
       formItemArr.push(
-        <FormItem style={ { marginBottom: 0 } } key={ (++key) }>
-          { getFieldDecorator(paramNamePrefix + paramName, {
-            initialValue: initialValue,
-            rules: [{ required: false }],
-          })(
-            <Input addonBefore={ addonBefore } placeholder={ placeholder }/>
-          ) }
+        <FormItem style={ { marginBottom: 0 } }
+                  key={ (++key) }
+                  name={ [paramNamePrefix, paramName] }
+                  rules={ [{ required: false }] }
+                  initialValue={ initialValue }
+        >
+          <Input addonBefore={ addonBefore } placeholder={ placeholder }/>
         </FormItem>
       )
     }

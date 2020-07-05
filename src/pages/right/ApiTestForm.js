@@ -1,10 +1,10 @@
-import React, {PureComponent} from 'react';
+import React, { PureComponent } from 'react';
 import PropTypes from 'prop-types';
 
 // 将json转为FormData
-import {objectToForm} from 'object-to-form';
+import { objectToForm } from 'object-to-form';
 
-import {message as antdMessage, notification, Form, Upload, Button, Icon} from 'antd'
+import { message as antdMessage, notification, Form, Upload, Button, Icon } from 'antd'
 
 import ApiTestFormParamPart from './ApiTestFormParamPart'
 import ApiTestFormNormalFormParamPart from './ApiTestFormNormalFormParamPart'
@@ -15,12 +15,17 @@ import ApiTestResponse from "@/pages/right/ApiTestResponse";
 import apiRemoteService from '@/services/ApiRemoteService'
 import WinterUtil from '@/util/WinterUtil'
 
-@Form.create()
 class ApiTestForm extends PureComponent {
 
   state = {
     apiExecute: false,
     fileList: []
+  }
+
+  formRef = React.createRef();
+
+  constructor(props) {
+    super(props);
   }
 
   componentDidUpdate(prevProps, prevState) {
@@ -46,13 +51,12 @@ class ApiTestForm extends PureComponent {
   }
 
   createFileUploadFormItem = (title, paramList) => {
-    const {getFieldDecorator} = this.props.form;
     const formItemArr = [];
     if (paramList && paramList.length > 0) {
 
       const fileUploadProps = {
         onRemove: (file) => {
-          this.setState(({fileList}) => {
+          this.setState(({ fileList }) => {
             const index = fileList.indexOf(file);
             const newFileList = fileList.slice();
             newFileList.splice(index, 1);
@@ -62,7 +66,7 @@ class ApiTestForm extends PureComponent {
           });
         },
         beforeUpload: (file) => {
-          this.setState(({fileList}) => ({
+          this.setState(({ fileList }) => ({
             fileList: [...fileList, file],
           }));
           return false;
@@ -70,18 +74,18 @@ class ApiTestForm extends PureComponent {
         fileList: this.state.fileList
       };
       formItemArr.push(
-        <Upload {...fileUploadProps} key={1}>
-          <Button size={'small'}>
+        <Upload { ...fileUploadProps } key={ 1 }>
+          <Button size={ 'small' }>
             <Icon type="upload"/> 选择文件
           </Button>
         </Upload>
       );
       return (
         <div>
-          <h3 className={styles.header}>
-            {title}
+          <h3 className={ styles.header }>
+            { title }
           </h3>
-          {formItemArr}
+          { formItemArr }
         </div>
       )
     }
@@ -120,7 +124,7 @@ class ApiTestForm extends PureComponent {
         this.responseCodeMirrorEditorWrapper.setWinterCodemirrorValue('服务器未给出任何响应. \r\n可能的原因: \r\n1.网络异常. \r\n2.服务器响应超时 \r\n3.客户端的超时时间设置过短 \r\n4.测试地址错误 \r\n5.后端服务未开启跨域支持')
       }
     } else {
-      const {data, response} = result
+      const { data, response } = result
       if (response.status === 200 || response.status === 201) {
         antdMessage.info(testApiUrl + '   ===>  http响应状态码: ' + response.status);
         let isBinaryResult = this.isBinaryResult(response.headers['content-type']);
@@ -176,8 +180,8 @@ class ApiTestForm extends PureComponent {
     return globalHeader
   }
 
-  responseIsImageResult = (apiDetail)=>{
-    const {produces} = apiDetail
+  responseIsImageResult = (apiDetail) => {
+    const { produces } = apiDetail
     let isImageResult = false;
     if (produces) {
       for (const single of produces) {
@@ -196,13 +200,12 @@ class ApiTestForm extends PureComponent {
     return isImageResult
   }
 
-  onSubmitForm = (e) => {
-    e.preventDefault()
+  onSubmitForm = (values) => {
     this.setState({
       apiExecute: true
     })
-    const {apiDetail, httpType, form, testApiFullUrl, globalHeaderArr} = this.props
-    const {fileParams, produces, consumes, method} = apiDetail
+    const { apiDetail, httpType, form, testApiFullUrl, globalHeaderArr } = this.props
+    const { fileParams, produces, consumes, method } = apiDetail
     const realGlobalHeader = this.extractValidGlobalHeader(globalHeaderArr)
 
     let accept = "application/json";
@@ -242,123 +245,140 @@ class ApiTestForm extends PureComponent {
       }
     }
 
-    form.validateFields((err, values) => {
-        if (this.requestCodeMirrorEditorWrapper) {
-          const bodyParams = this.requestCodeMirrorEditorWrapper.getWinterCodeMirrorValue()
-          if (bodyParams) {
-            values['__bodyForm'] = bodyParams
-          }
-        }
-
-        const {__path, __header, __form, __bodyForm} = values
-        console.log(values);//__path, __header, __form, __bodyForm
-
-        // 构建请求头参数
-        let headers = values['__header'];
-        if (!isUpload) {
-          if (headers) {
-            headers = {...realGlobalHeader, ...headers, Accept: accept, 'Content-Type': contentType}
-          } else {
-            headers = {...realGlobalHeader, Accept: accept, 'Content-Type': contentType}
-          }
-        }
-
-        const upperMethod = method.toUpperCase()
-
-        const realApiTestUrl = __path ? WinterUtil.formReplacePathVar(testApiFullUrl, __path) : testApiFullUrl;
-        const that = this
-
-        if (upperMethod === 'POST') {
-          if (isUpload) {
-            const {fileList} = this.state
-            // post文件上传
-            let previousFormData = new FormData();
-            let idx = 0
-            fileList.forEach((file) => {
-              previousFormData.append(apiDetail.fileParams[idx].name, file);
-              idx++
-            });
-            let normalFormData = __form ? __form : {};
-            let formData = objectToForm(normalFormData, previousFormData);
-
-
-            apiRemoteService.postUpload(realApiTestUrl, formData, {...realGlobalHeader, ...__header}).then(function (result) {
-              that.printResponse(realApiTestUrl, result)
-            });
-          } else if (__bodyForm) {
-            if (isBinaryResult) {
-              // 这个实际上是post文件下载
-              apiRemoteService.normalBodyDownloadPost(realApiTestUrl, __bodyForm, {...realGlobalHeader, ...__header}).then(function (result) {
-                that.printResponse(realApiTestUrl, result)
-              });
-            } else {
-              // post使用request body传参
-              apiRemoteService.normalBodyPost(realApiTestUrl, __bodyForm, headers).then(function (result) {
-                that.printResponse(realApiTestUrl, result)
-              });
-            }
-          } else {
-            // post使用普通的表单传参
-            const tmpObj = this.removeEmptyValueField(__form)
-            apiRemoteService.normalFormPost(realApiTestUrl, tmpObj, headers).then(function (result) {
-              that.printResponse(realApiTestUrl, result)
-            });
-          }
-        } else if (upperMethod === 'GET') {
-          if (isImageResult) {
-            // 是获取图片的请求
-            let oldImg = document.getElementById('image-content-image');
-            if (oldImg) {
-              oldImg.remove();
-            }
-            let img = document.createElement('img');
-            const tmpObj = this.removeEmptyValueField(__form)
-            img.src = WinterUtil.convertRealUrl(realApiTestUrl, {...tmpObj,__timezone_clear_cache__:new Date().getTime()});
-            console.log(img.src)
-            img.setAttribute('id', 'image-content-image');
-            document.getElementById('image-content').append(img);
-            this.setState({
-              apiExecute: false
-            })
-          } else {
-            // 普通get提交
-            const tmpObj = this.removeEmptyValueField(__form)
-            apiRemoteService.normalGet(realApiTestUrl, tmpObj, headers).then(function (result) {
-              that.printResponse(realApiTestUrl, result)
-            });
-          }
-        } else if (upperMethod === 'PUT') {
-          if (__bodyForm) {
-            apiRemoteService.normalBodyPut(realApiTestUrl, __bodyForm, headers).then(function (result) {
-              that.printResponse(realApiTestUrl, result)
-            })
-          } else {
-            const tmpObj = this.removeEmptyValueField(__form)
-            apiRemoteService.normalFormPut(realApiTestUrl, tmpObj, headers).then(function (result) {
-              that.printResponse(realApiTestUrl, result)
-            })
-          }
-        } else if (upperMethod === 'DELETE') {
-          const tmpObj = this.removeEmptyValueField(__form)
-          apiRemoteService.normalDelete(realApiTestUrl, tmpObj, headers).then(function (result) {
-            that.printResponse(realApiTestUrl, result)
-          })
-        } else if (upperMethod === 'PATCH') {
-          if (__bodyForm) {
-            // patch使用request body传参
-            apiRemoteService.normalBodyPath(realApiTestUrl, __bodyForm, headers).then(function (result) {
-              that.printResponse(realApiTestUrl, result)
-            });
-          } else {
-            // patch使用普通的表单传参
-            const tmpObj = this.removeEmptyValueField(__form)
-            apiRemoteService.normalGet(realApiTestUrl, tmpObj, headers).then(function (result) {
-              that.printResponse(realApiTestUrl, result)
-            });
-          }
+    let isNormalPostForm = false;
+    if(consumes){
+      for (const single of consumes) {
+        if('application/x-www-form-urlencoded'===single){
+          isNormalPostForm=true;
+          break;
         }
       }
-    )
+    }
+
+    if (this.requestCodeMirrorEditorWrapper) {
+      const bodyParams = this.requestCodeMirrorEditorWrapper.getWinterCodeMirrorValue()
+      if (bodyParams) {
+        values['__bodyForm'] = bodyParams
+      }
+    }
+
+    const { __path, __header, __form, __bodyForm } = values
+    console.log(values);//__path, __header, __form, __bodyForm
+
+    // 构建请求头参数
+    let headers = values['__header'];
+    if (!isUpload) {
+      if (headers) {
+        headers = { ...realGlobalHeader, ...headers, Accept: accept, 'Content-Type': contentType }
+      } else {
+        headers = { ...realGlobalHeader, Accept: accept, 'Content-Type': contentType }
+      }
+    }
+
+    const upperMethod = method.toUpperCase()
+
+    const realApiTestUrl = __path ? WinterUtil.formReplacePathVar(testApiFullUrl, __path) : testApiFullUrl;
+    const that = this
+
+    if (upperMethod === 'POST') {
+      if (isUpload) {
+        const { fileList } = this.state
+        // post文件上传
+        let previousFormData = new FormData();
+        let idx = 0
+        fileList.forEach((file) => {
+          previousFormData.append(apiDetail.fileParams[idx].name, file);
+          idx++
+        });
+        let normalFormData = __form ? __form : {};
+        let formData = objectToForm(normalFormData, previousFormData);
+
+
+        apiRemoteService.postUpload(realApiTestUrl, formData, { ...realGlobalHeader, ...__header }).then(function (result) {
+          that.printResponse(realApiTestUrl, result)
+        });
+      } else if (__bodyForm) {
+        if (isBinaryResult) {
+          // 这个实际上是post文件下载
+          apiRemoteService.normalBodyDownloadPost(realApiTestUrl, __bodyForm, { ...realGlobalHeader, ...__header }).then(function (result) {
+            that.printResponse(realApiTestUrl, result)
+          });
+        } else {
+          // post使用request body传参
+          apiRemoteService.normalBodyPost(realApiTestUrl, __bodyForm, headers).then(function (result) {
+            that.printResponse(realApiTestUrl, result)
+          });
+        }
+      } else {
+        const tmpObj = this.removeEmptyValueField(__form)
+        if(isNormalPostForm){
+          // post使用普通的表单传参
+          console.log('upperMethod',upperMethod,__form)
+          apiRemoteService.normalFormPost(realApiTestUrl, tmpObj, headers).then(function (result) {
+            that.printResponse(realApiTestUrl, result)
+          });
+        }else{
+          apiRemoteService.specialFormPost(realApiTestUrl, tmpObj, headers).then(function (result) {
+            that.printResponse(realApiTestUrl, result)
+          });
+        }
+      }
+    } else if (upperMethod === 'GET') {
+      if (isImageResult) {
+        // 是获取图片的请求
+        let oldImg = document.getElementById('image-content-image');
+        if (oldImg) {
+          oldImg.remove();
+        }
+        let img = document.createElement('img');
+        const tmpObj = this.removeEmptyValueField(__form)
+        img.src = WinterUtil.convertRealUrl(realApiTestUrl, {
+          ...tmpObj,
+          __timezone_clear_cache__: new Date().getTime()
+        });
+        console.log(img.src)
+        img.setAttribute('id', 'image-content-image');
+        document.getElementById('image-content').append(img);
+        this.setState({
+          apiExecute: false
+        })
+      } else {
+        // 普通get提交
+        const tmpObj = this.removeEmptyValueField(__form)
+        apiRemoteService.normalGet(realApiTestUrl, tmpObj, headers).then(function (result) {
+          that.printResponse(realApiTestUrl, result)
+        });
+      }
+    } else if (upperMethod === 'PUT') {
+      if (__bodyForm) {
+        apiRemoteService.normalBodyPut(realApiTestUrl, __bodyForm, headers).then(function (result) {
+          that.printResponse(realApiTestUrl, result)
+        })
+      } else {
+        const tmpObj = this.removeEmptyValueField(__form)
+        apiRemoteService.normalFormPut(realApiTestUrl, tmpObj, headers).then(function (result) {
+          that.printResponse(realApiTestUrl, result)
+        })
+      }
+    } else if (upperMethod === 'DELETE') {
+      const tmpObj = this.removeEmptyValueField(__form)
+      apiRemoteService.normalDelete(realApiTestUrl, tmpObj, headers).then(function (result) {
+        that.printResponse(realApiTestUrl, result)
+      })
+    } else if (upperMethod === 'PATCH') {
+      if (__bodyForm) {
+        // patch使用request body传参
+        apiRemoteService.normalBodyPath(realApiTestUrl, __bodyForm, headers).then(function (result) {
+          that.printResponse(realApiTestUrl, result)
+        });
+      } else {
+        // patch使用普通的表单传参
+        const tmpObj = this.removeEmptyValueField(__form)
+        apiRemoteService.normalGet(realApiTestUrl, tmpObj, headers).then(function (result) {
+          that.printResponse(realApiTestUrl, result)
+        });
+      }
+    }
   }
 
   onApiTestFormBodyParamPartMounted = (ApiTestFormBodyParamPartInstance) => {
@@ -371,41 +391,43 @@ class ApiTestForm extends PureComponent {
 
   render() {
     console.log('ApiTestForm')
-    const {testApiFullUrl, apiDetail, swaggerDocBasicInfo, form} = this.props
+    const { testApiFullUrl, apiDetail, swaggerDocBasicInfo, form } = this.props
+    console.log('apiDetail',apiDetail)
     return (
-      <div className={styles.container}>
-        <Form onSubmit={this.onSubmitForm}>
+      <div className={ styles.container }>
+        <Form ref={this.formRef} onFinish={ this.onSubmitForm }>
           <ApiTestFormParamPart
-            paramNamePrefix={'__path.'}
-            title={'路径参数'}
-            form={form}
-            paramList={apiDetail.pathParams}/>
+            paramNamePrefix={ '__path' }
+            title={ '路径参数' }
+            form={ form }
+            paramList={ apiDetail.pathParams }/>
           <ApiTestFormParamPart
-            paramNamePrefix={'__header.'}
-            title={'请求头参数'}
-            form={form}
-            paramList={apiDetail.headerParams}/>
+            paramNamePrefix={ '__header' }
+            title={ '请求头参数' }
+            form={ form }
+            paramList={ apiDetail.headerParams }/>
           <ApiTestFormNormalFormParamPart
-            paramNamePrefix={'__form.'}
-            title={'表单参数'}
-            form={form}
-            paramList={apiDetail.formParams}/>
+            paramNamePrefix={ '__form' }
+            title={ '表单参数' }
+            form={ form }
+            paramList={ apiDetail.formParams }/>
 
-          {this.createFileUploadFormItem('文件参数', apiDetail.fileParams)}
+          { this.createFileUploadFormItem('文件参数', apiDetail.fileParams) }
 
           <ApiTestFormBodyParamPart
-            title={'请求体参数'}
-            apiDetail={apiDetail}
-            onMounted={this.onApiTestFormBodyParamPartMounted}
+            title={ '请求体参数' }
+            apiDetail={ apiDetail }
+            onMounted={ this.onApiTestFormBodyParamPartMounted }
           />
 
-          <Button type="primary" htmlType="submit" block style={{marginTop: 10}}
-                  loading={this.state.apiExecute}>
+          <Button type="primary" htmlType="submit" block style={ { marginTop: 10 } }
+                  loading={ this.state.apiExecute }>
             执行
           </Button>
         </Form>
 
-        <ApiTestResponse onMounted={this.onApiTestResponseMounted} isImageResult={this.responseIsImageResult(apiDetail)}/>
+        <ApiTestResponse onMounted={ this.onApiTestResponseMounted }
+                         isImageResult={ this.responseIsImageResult(apiDetail) }/>
       </div>
     );
   }

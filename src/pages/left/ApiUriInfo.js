@@ -25,9 +25,9 @@ const ApiUriInfo = (props) => {
         <span className={ styles['api-uri'] }>{ apiDetail.path }</span>
       </div>
       <Row className={ styles['other-info'] }>
-        <Col span={ 12 }><strong className={ styles['label'] }>请求数据格式:</strong><span>{ apiDetail.produces }</span></Col>
+        <Col span={ 12 }><strong className={ styles['label'] }>请求数据格式:</strong><span>{ apiDetail.consumes }</span></Col>
         <Col span={ 12 }><strong
-          className={ styles['label'] }>响应数据格式:</strong><span>{ apiDetail.consumes ? apiDetail.consumes : ['application/json'] }</span></Col>
+          className={ styles['label'] }>响应数据格式:</strong><span>{ apiDetail.produces ? apiDetail.produces : ['application/json'] }</span></Col>
       </Row>
     </div>
   );

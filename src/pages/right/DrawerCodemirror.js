@@ -4,7 +4,11 @@ import WinterCodemirror from "@/components/WinterCodemirror";
 import WinterUtil from "@/util/WinterUtil";
 import {Row, Col, Button, Input} from 'antd'
 
+import {
+  ArrowUpOutlined,ArrowDownOutlined
+} from '@ant-design/icons';
 const {Search} = Input
+
 
 class DrawerCodemirror extends Component {
 
@@ -226,11 +230,11 @@ class DrawerCodemirror extends Component {
             />
           </Col>
           <Col span={5}>
-            <Button icon={'arrow-down'} size={this.size} onClick={this.onQueryNext}
+            <Button icon={<ArrowDownOutlined />} size={this.size} onClick={this.onQueryNext}
                     style={{width: '100%'}}/>
           </Col>
           <Col span={5}>
-            <Button icon={'arrow-up'} size={this.size} onClick={this.onQueryPrevious}
+            <Button icon={<ArrowUpOutlined />} size={this.size} onClick={this.onQueryPrevious}
                     style={{width: '100%'}}/>
           </Col>
         </Row>
