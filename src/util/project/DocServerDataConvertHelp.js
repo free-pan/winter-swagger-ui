@@ -27,7 +27,8 @@ class ApiDetailExtract {
       formParams: formParams,
       fileParams: fileParams,
       bodyName: '',
-      bodyTypeIsArray:false
+      bodyTypeIsArray:false,
+      bodyTypeArrayItemType:''
     }
 
     if (typeof (parameters) !== 'undefined') {
@@ -73,6 +74,7 @@ class ApiDetailExtract {
             result['bodyTypeIsArray'] = true
             if(typeof (singleParam['schema']['items']) !== 'undefined'){
               if(typeof(singleParam['schema']['items']['$ref'])!=='undefined'){
+                result['bodyTypeArrayItemType']='object'
                 const realParamTypeName = this.extractRealParamTypeName(singleParam['schema']['items']['$ref'])
                 const realRaramTypeDefine = definitions[realParamTypeName]
                 if (typeof (realRaramTypeDefine) !== 'undefined') {
@@ -81,6 +83,8 @@ class ApiDetailExtract {
                     bodyParams.push(p)
                   }
                 }
+              }else if(typeof(singleParam['schema']['items']['type'])!=='undefined'){
+                result['bodyTypeArrayItemType']=singleParam['schema']['items']['type']
               }
             }
           }
@@ -487,6 +491,7 @@ export default (docRespData) => {
             deprecated: deprecated,
             bodyName: reqParams.bodyName,
             bodyTypeIsArray: reqParams.bodyTypeIsArray,
+            bodyTypeArrayItemType:reqParams.bodyTypeArrayItemType,
             headerParams: reqParams.headerParams,
             pathParams: reqParams.pathParams,
             formParams: reqParams.formParams,

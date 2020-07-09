@@ -40,6 +40,7 @@ class Index extends Component {
     console.log('left index')
     const { apiDetail } = this.props.GlobalModel
     console.log('apiDetail-------->',apiDetail)
+
     if (apiDetail) {
       return (
         <div style={ { width: '100%', height: '100%', padding: '10px', scrollBehavior: 'smooth' } } ref={ 'container' }>
@@ -49,7 +50,7 @@ class Index extends Component {
           <ApiRequestParamPart paramList={ apiDetail.pathParams } title={ "路径参数" }/>
           <ApiRequestParamPart paramList={ apiDetail.headerParams } title={ "请求头参数" }/>
           <ApiRequestParamPart paramList={ apiDetail.fileParams } title={ "文件参数" }/>
-          <ApiRequestParamPart paramList={ apiDetail.bodyParams } forceRender={apiDetail.bodyTypeIsArray} title={ apiDetail.bodyTypeIsArray?(<span>请求体参数<small>&nbsp;&nbsp;<i>array</i></small></span>):"请求体参数" }/>
+          <ApiRequestParamPart paramList={ apiDetail.bodyParams } forceRender={apiDetail.bodyTypeIsArray} title={ apiDetail.bodyTypeIsArray?(<span>请求体参数<small>&nbsp;&nbsp;<i>array({apiDetail.bodyTypeArrayItemType})</i></small></span>):"请求体参数" }/>
           <ApiRequestParamPart paramList={ apiDetail.formParams } title={ "表单参数" }/>
           <h2 className={ styles['big-title'] }>其它说明</h2>
           <ApiNote apiDetail={ apiDetail }/>
