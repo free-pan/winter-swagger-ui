@@ -62,6 +62,7 @@ class ApiDetailExtract {
             result['bodyTypeIsArray'] = false
             const realParamTypeName = this.extractRealParamTypeName(singleParam['schema']['$ref'])
             const realRaramTypeDefine = definitions[realParamTypeName]
+            console.log(realRaramTypeDefine)
             if (typeof (realRaramTypeDefine) !== 'undefined') {
               const paramArr = this.extractSingleComplexParam(realRaramTypeDefine, definitions, 0, realRaramTypeDefine)
               for (const p of paramArr) {
@@ -308,37 +309,48 @@ class ApiDetailExtract {
             const treeNode = this.buildLeafTreeNode(paramName, description, type, required)
             resultArr.push(treeNode)
           }
-        } else if (complexTypeDefine.properties[paramName].type === 'array' && typeof (complexTypeDefine.properties[paramName].items) !== 'undefined' && typeof (complexTypeDefine.properties[paramName].items['$ref']) !== 'undefined') {
+        } else if (complexTypeDefine.properties[paramName].type === 'array' && typeof (complexTypeDefine.properties[paramName].items) !== 'undefined') {
           const required = complexTypeDefine.properties[paramName].allowEmptyValue
-          const realTypeName = this.extractRealParamTypeName(complexTypeDefine.properties[paramName].items['$ref'])
-          if (typeof (definitions[realTypeName]) !== 'undefined') {
-            if (realTypeName === parentTypeName) {
-              const treeNode = {
-                key: ++this.globalKey,
-                name: paramName,
-                type: 'array<object>',
-                description: complexTypeDefine.properties[paramName].description,
-                required: required,
-                children: null
+          if(typeof (complexTypeDefine.properties[paramName].items['$ref']) !== 'undefined'){
+            const realTypeName = this.extractRealParamTypeName(complexTypeDefine.properties[paramName].items['$ref'])
+            if (typeof (definitions[realTypeName]) !== 'undefined') {
+              if (realTypeName === parentTypeName) {
+                const treeNode = {
+                  key: ++this.globalKey,
+                  name: paramName,
+                  type: 'array<object>',
+                  description: complexTypeDefine.properties[paramName].description,
+                  required: required,
+                  children: null
+                }
+                resultArr.push(treeNode)
+              } else {
+                const treeNode = {
+                  key: ++this.globalKey,
+                  name: paramName,
+                  type: 'array<object>',
+                  description: complexTypeDefine.properties[paramName].description,
+                  required: required,
+                  children: this.extractSingleComplexParam(definitions[realTypeName], definitions, ++callSize, realTypeName)
+                }
+                resultArr.push(treeNode)
               }
-              resultArr.push(treeNode)
             } else {
-              const treeNode = {
-                key: ++this.globalKey,
-                name: paramName,
-                type: 'array<object>',
-                description: complexTypeDefine.properties[paramName].description,
-                required: required,
-                children: this.extractSingleComplexParam(definitions[realTypeName], definitions, ++callSize, realTypeName)
-              }
+              const description = complexTypeDefine.properties[paramName].description
+              const type = 'array<object>'
+              // 构建叶子节点
+              const treeNode = this.buildLeafTreeNode(paramName, description, type, required)
               resultArr.push(treeNode)
             }
-          } else {
-            const description = complexTypeDefine.properties[paramName].description
-            const type = 'array<object>'
-            // 构建叶子节点
-            const treeNode = this.buildLeafTreeNode(paramName, description, type, required)
-            resultArr.push(treeNode)
+          }else if(typeof (complexTypeDefine.properties[paramName].items['type']) !== 'undefined'){
+            const originalDataTypeDefine = complexTypeDefine.properties[paramName]
+            const dataTypeDefine = { ...originalDataTypeDefine }
+            dataTypeDefine['name'] = paramName
+            const required = Util.arrayContainsVal(complexTypeDefine.required, paramName)
+            dataTypeDefine['required'] = required
+            console.log('<><><><>',dataTypeDefine)
+            dataTypeDefine['format']=complexTypeDefine.properties[paramName].items['type']
+            resultArr.push(this.extractSingleSimpleParam(dataTypeDefine))
           }
         } else {
           const originalDataTypeDefine = complexTypeDefine.properties[paramName]
