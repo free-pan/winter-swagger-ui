@@ -46,9 +46,10 @@ export function buildObjectInitVal(obj) {
  * @param bodyName {string} 当数据格式为xml时,该参数有值
  * @param consumesIsJson {boolean} 数据格式是否为json
  * @param paramList {array} 参数信息列表
+ * @param bodyTypeIsArray {boolean} body的最外层是否是数组类型
  * @return {string}
  */
-export function buildBodyParamInitValue(bodyName, consumesIsJson, paramList) {
+export function buildBodyParamInitValue(bodyName, consumesIsJson, paramList,bodyTypeIsArray) {
   let reqData = {};
 
   for (const singleParam of paramList) {
@@ -78,7 +79,12 @@ export function buildBodyParamInitValue(bodyName, consumesIsJson, paramList) {
   } else {
     obj[bodyName] = reqData;
   }
-  let codeVal = JSON.stringify(obj, null, 4);
+  let codeVal = null;
+  if(bodyTypeIsArray){
+    codeVal = JSON.stringify([obj], null, 4);
+  }else{
+    codeVal = JSON.stringify(obj, null, 4);
+  }
   if (!consumesIsJson) {
     codeVal = convert.json2xml(obj, {compact: true, ignoreComment: true, spaces: 4});
   }

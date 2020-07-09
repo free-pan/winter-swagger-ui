@@ -1,9 +1,9 @@
-import React, {PureComponent} from 'react';
+import React, { PureComponent } from 'react';
 import PropTypes from 'prop-types';
 
-import {buildBodyParamInitValue} from '@/util/ApiParamInitDataUtil'
+import { buildBodyParamInitValue } from '@/util/ApiParamInitDataUtil'
 
-import {Drawer} from 'antd'
+import { Drawer } from 'antd'
 
 import DrawerCodemirror from "@/pages/right/DrawerCodemirror";
 
@@ -31,8 +31,10 @@ class ApiTestFormBodyParamPart extends PureComponent {
   }
 
   componentDidMount() {
-    const {apiDetail, onMounted} = this.props
+    const { apiDetail, onMounted } = this.props
     if (apiDetail && apiDetail.bodyParams && apiDetail.bodyParams.length > 0) {
+      this.buildCodeMirrorValue();
+    }else if(apiDetail.bodyTypeIsArray){
       this.buildCodeMirrorValue();
     }
     if (onMounted) {
@@ -43,12 +45,18 @@ class ApiTestFormBodyParamPart extends PureComponent {
 
   buildCodeMirrorValue() {
     if (this.props.apiDetail && this.props.apiDetail.bodyParams && this.props.apiDetail.bodyParams.length > 0) {
-      const {bodyParams, consumes, bodyName} = this.props.apiDetail
+      console.log('执行------->')
+      const { bodyParams, consumes, bodyName, bodyTypeIsArray } = this.props.apiDetail
       const consumesIsJson = this.consumesIsJson(consumes)
-      const initValue = buildBodyParamInitValue(bodyName, consumesIsJson, bodyParams)
-      console.log('bodyParams',bodyParams,consumesIsJson,initValue)
+      const initValue = buildBodyParamInitValue(bodyName, consumesIsJson, bodyParams, bodyTypeIsArray)
+      console.log('bodyParams', bodyParams, consumesIsJson, initValue)
       if (this.editor) {
         this.editor.setValue(initValue)
+      }
+    }else if(this.props.apiDetail.bodyTypeIsArray){
+      console.log('执行')
+      if (this.editor) {
+        this.editor.setValue("[]")
       }
     }
   }
@@ -96,13 +104,13 @@ class ApiTestFormBodyParamPart extends PureComponent {
   }
 
   onShowDrawer = () => {
-    this.setState({drawerVisible: true});
+    this.setState({ drawerVisible: true });
     this.drawerCodemirrorInstance.setValue(this.getWinterCodeMirrorValue())
   }
 
   onDrawerClose = (e) => {
     e.preventDefault()
-    this.setState({drawerVisible: false});
+    this.setState({ drawerVisible: false });
   }
 
   onDrawerCodemirrorMounted = (editorInstance) => {
@@ -112,49 +120,49 @@ class ApiTestFormBodyParamPart extends PureComponent {
   onDrawerCodemirrorSave = (content) => {
     if (this.editor) {
       this.editor.setValue(content)
-      this.setState({drawerVisible: false})
+      this.setState({ drawerVisible: false })
     }
   }
 
   render() {
-    const {apiDetail, title} = this.props
-    const {drawerVisible} = this.state
-    const {bodyParams, consumes, bodyName} = apiDetail
+    const { apiDetail, title } = this.props
+    const { drawerVisible } = this.state
+    const { bodyParams, consumes, bodyName, bodyTypeIsArray } = apiDetail
     const paramList = bodyParams
-    if (paramList && paramList.length > 0) {
+    if ((paramList && paramList.length > 0) || bodyTypeIsArray) {
       const consumesIsJson = this.consumesIsJson(consumes)
       return (
         <div>
-          <h3 className={styles.header}>
-            {title}
-            <a style={{fontSize: '13px', marginLeft: '5px'}}
-               onClick={this.onShowDrawer}
+          <h3 className={ styles.header }>
+            { title }
+            <a style={ { fontSize: '13px', marginLeft: '5px' } }
+               onClick={ this.onShowDrawer }
             >独立窗编辑</a>
           </h3>
-          <div className={styles.editorBorder}>
+          <div className={ styles.editorBorder }>
             <WinterCodemirror
-              idPrefix={'req_small_'}
-              size={{height: 256}}
-              cmOption={{
+              idPrefix={ 'req_small_' }
+              size={ { height: 256 } }
+              cmOption={ {
                 mode: consumesIsJson ? 'javascript' : 'xml'
-              }}
-              onMounted={this.onWinterCodeMirrorMounted}
+              } }
+              onMounted={ this.onWinterCodeMirrorMounted }
             />
           </div>
 
           <Drawer
             placement="right"
-            closable={true}
-            onClose={this.onDrawerClose}
-            visible={drawerVisible}
-            getContainer={false}
-            width={550}
-            className={styles.codemirrorDrawer}
-            style={{position: 'absolute'}}
+            closable={ true }
+            onClose={ this.onDrawerClose }
+            visible={ drawerVisible }
+            getContainer={ false }
+            width={ 550 }
+            className={ styles.codemirrorDrawer }
+            style={ { position: 'absolute' } }
           >
-            <DrawerCodemirror title={'查看/编辑请求体参数'}
-                              onMounted={this.onDrawerCodemirrorMounted}
-                              visible={drawerVisible} readOnly={false} onSave={this.onDrawerCodemirrorSave}/>
+            <DrawerCodemirror title={ '查看/编辑请求体参数' }
+                              onMounted={ this.onDrawerCodemirrorMounted }
+                              visible={ drawerVisible } readOnly={ false } onSave={ this.onDrawerCodemirrorSave }/>
           </Drawer>
         </div>
       )

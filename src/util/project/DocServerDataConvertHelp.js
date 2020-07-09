@@ -26,7 +26,8 @@ class ApiDetailExtract {
       pathParams: pathParams,
       formParams: formParams,
       fileParams: fileParams,
-      bodyName: ''
+      bodyName: '',
+      bodyTypeIsArray:false
     }
 
     if (typeof (parameters) !== 'undefined') {
@@ -56,13 +57,29 @@ class ApiDetailExtract {
         }
         if (singleParam.in === 'body') {
           result['bodyName'] = singleParam.name
+          console.log('--------->',singleParam.name,singleParam)
           if (typeof (singleParam['schema']['$ref']) !== 'undefined') {
+            result['bodyTypeIsArray'] = false
             const realParamTypeName = this.extractRealParamTypeName(singleParam['schema']['$ref'])
             const realRaramTypeDefine = definitions[realParamTypeName]
             if (typeof (realRaramTypeDefine) !== 'undefined') {
               const paramArr = this.extractSingleComplexParam(realRaramTypeDefine, definitions, 0, realRaramTypeDefine)
               for (const p of paramArr) {
                 bodyParams.push(p)
+              }
+            }
+          }else if((typeof (singleParam['schema']['type']) !== 'undefined') && (singleParam['schema']['type']=='array')){
+            result['bodyTypeIsArray'] = true
+            if(typeof (singleParam['schema']['items']) !== 'undefined'){
+              if(typeof(singleParam['schema']['items']['$ref'])!=='undefined'){
+                const realParamTypeName = this.extractRealParamTypeName(singleParam['schema']['items']['$ref'])
+                const realRaramTypeDefine = definitions[realParamTypeName]
+                if (typeof (realRaramTypeDefine) !== 'undefined') {
+                  const paramArr = this.extractSingleComplexParam(realRaramTypeDefine, definitions, 0, realRaramTypeDefine)
+                  for (const p of paramArr) {
+                    bodyParams.push(p)
+                  }
+                }
               }
             }
           }
@@ -457,6 +474,7 @@ export default (docRespData) => {
             method: method,
             deprecated: deprecated,
             bodyName: reqParams.bodyName,
+            bodyTypeIsArray: reqParams.bodyTypeIsArray,
             headerParams: reqParams.headerParams,
             pathParams: reqParams.pathParams,
             formParams: reqParams.formParams,
