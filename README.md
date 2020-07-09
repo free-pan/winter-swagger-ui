@@ -14,9 +14,9 @@
 
 ## 前提
 
-全局安装`umi 2.x`
+全局安装`umi 3.x`
 
-`tyarn global add umi@2.13.3`
+`tyarn global add umi`
 
 ## 运行
 
