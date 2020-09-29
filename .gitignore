@@ -352,3 +352,5 @@ $RECYCLE.BIN/
 
 .umi/
 .umi-production/
+.npmrc
+.yarnrc
