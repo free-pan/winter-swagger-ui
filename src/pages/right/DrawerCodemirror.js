@@ -37,6 +37,7 @@ class DrawerCodemirror extends Component {
    * @param value
    */
   setValue = (value) => {
+    console.log('xxx:',this.winterCodemirrorInstance,value)
     if (this.winterCodemirrorInstance) {
       this.winterCodemirrorInstance.setValue(value)
     } else {
@@ -51,6 +52,7 @@ class DrawerCodemirror extends Component {
   onWinterCodemirrorMounted = (WinterCodemirrorInstance) => {
     this.winterCodemirrorInstance = WinterCodemirrorInstance
     const {onMounted} = this.props
+    console.log('onMounted-->',onMounted)
     if (onMounted) {
       onMounted(this)
     }
