@@ -233,7 +233,7 @@ class BasicLayout extends Component {
                   <ApiTest {...propsApiTest}/>
                 </TabPane>
                 <TabPane tab="全局请求头" key="GlobalHeader">
-                  {/*<GlobalHeader {...propsGlobalHeader}/>*/}
+                  <GlobalHeader {...propsGlobalHeader}/>
                 </TabPane>
                 <TabPane tab="文档概况" key="DocSummary">
                   <DocSummary {...propsDocSummary} />
