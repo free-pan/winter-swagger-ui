@@ -97,7 +97,8 @@ const EditableCell = ({
                 <Input ref={inputRef} onPressEnter={save} onBlur={save}/>
             </Form.Item>
         ) : (
-            <div className="editable-cell-value-wrap" style={{paddingRight: 24}} onClick={toggleEdit}>
+            <div className="editable-cell-value-wrap"
+                 onClick={toggleEdit}>
                 {children}
             </div>
         );
@@ -115,7 +116,7 @@ const GlobalHeader = (props) => {
             dataIndex: 'name',
             key: 'name',
             editable: true,
-            width: '30%',
+            width:140,
         },
         {
             title: '值',
@@ -125,6 +126,7 @@ const GlobalHeader = (props) => {
         },
         {
             title: '操作',
+            width: 70,
             dataIndex: 'operation',
             render: (text, record) =>
                 globalHeaderArr.length >= 1 ? (
@@ -195,6 +197,7 @@ const GlobalHeader = (props) => {
                 新增
             </Button>
             <Table
+                scroll={{ y: 460 }}
                 components={components}
                 rowClassName={() => 'editable-row'}
                 bordered
